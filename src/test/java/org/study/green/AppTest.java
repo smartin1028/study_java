@@ -1,4 +1,4 @@
-package org;
+package org.study.green;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

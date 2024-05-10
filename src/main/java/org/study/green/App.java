@@ -1,4 +1,4 @@
-package org;
+package org.study.green;
 
 /**
  * Hello world!
