@@ -1,5 +1,6 @@
 package org.study.green.stream;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class AggregateFunctionsTest {
@@ -8,8 +9,28 @@ public class AggregateFunctionsTest {
         AggregateFunctionsTest functionsTest = new AggregateFunctionsTest();
         functionsTest.arrTest();
         functionsTest.ArrayListTest();
+        functionsTest.bigDecimalTest();
 
     }
+
+    private void bigDecimalTest() {
+        System.out.println("AggregateFunctionsTest.bigDecimalTest");
+        List<BigDecimal> numbers = Arrays.asList(
+                new BigDecimal("1"),
+                new BigDecimal("2"),
+                new BigDecimal("3"),
+                new BigDecimal("4"),
+                new BigDecimal("5")
+        );
+
+        BigDecimal sum = numbers.stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal average = sum.divide(new BigDecimal(numbers.size()));
+
+        System.out.println("Average: " + average);
+    }
+
     public void arrTest() {
         System.out.println(" arrTest ");
         int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -65,6 +86,7 @@ public class AggregateFunctionsTest {
         // total
         long total = numbers.size();
         System.out.println("Total: " + total);
+
 
         // average
         OptionalDouble average = numbers.stream().mapToInt(Integer::intValue).average();
