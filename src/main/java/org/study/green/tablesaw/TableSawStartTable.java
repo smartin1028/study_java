@@ -1,10 +1,7 @@
 package org.study.green.tablesaw;
 
 import org.study.green.resource.ResourceUtils;
-import tech.tablesaw.api.DateColumn;
-import tech.tablesaw.api.DoubleColumn;
-import tech.tablesaw.api.StringColumn;
-import tech.tablesaw.api.Table;
+import tech.tablesaw.api.*;
 import tech.tablesaw.columns.Column;
 import tech.tablesaw.selection.Selection;
 
@@ -13,8 +10,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalDouble;
+import java.util.function.Consumer;
 
 public class TableSawStartTable {
 
@@ -31,11 +31,106 @@ public class TableSawStartTable {
         ImportingData();
         ExploringTables();
 
+        WorkingColumns01();
         WorkingColumns();
 
-        GettingSpecificColumnTypesFromTable();
+//        GettingSpecificColumnTypesFromTable();
+
+        WorkingRowsTest();
+        SortingTest();
 
         System.out.println("TableSawStartTable.TableSawStartTable - End");
+    }
+
+    /**
+     * Sorting
+     * 테이블을 정렬하려면 sortOn()메서드를 사용하고 하나 이상의 열 이름을 지정하면 됩니다.
+     */
+    private void SortingTest() {
+        Table sorted = bushTable.sortOn("date", "-approval"); // Sorts Ascending by Default
+//        sorted = bushTable.sortDescendingOn( "approval"); // Sorts Ascending by Default
+        System.out.println("sorted = " + sorted.printAll());
+
+//        sorted = table.sortAscendingOn("bar"); // just like sortOn(), but makes the order explicit.
+//        sorted = table.sortDescendingOn("foo");
+//
+//        // sort on foo ascending, then bar descending. Note the minus sign preceding the name of
+//        // column bar.
+//        sorted = table.sortOn("foo", "-bar");
+
+    }
+
+    /**
+     * Working with rows
+     * 열과 마찬가지로 행 방식으로 테이블을 작업하기 위한 다양한 옵션이 있습니다. 다음은 몇 가지 유용한 것입니다:
+     * 테이블의 각 행에 대해 임의의 작업을 수행할 수도 있습니다. 한 가지 방법은 행을 반복하고 각 열을 개별적으로 작업하는 것입니다.
+     */
+    private void WorkingRowsTest() {
+
+        bushTable.sortAscendingOn("index");
+        Table result = bushTable.dropDuplicateRows();
+
+        System.out.println("result.rowCount() = " + result.rowCount());
+        result = bushTable.dropRowsWithMissingValues();
+
+        System.out.println("result.rowCount() = " + result.rowCount());
+        // drop rows using Selections
+        result = bushTable.dropWhere(bushTable.numberColumn(1).isLessThan(60));
+        System.out.println("result.rowCount() = " + result.rowCount());
+        // add rows
+        bushTable.addRow(43, bushTable); // adds row 43 from sourceTable to the receiver
+        System.out.println("bushTable.rowCount() = " + bushTable.rowCount());
+        // sampling
+        Table rows = bushTable.sampleN(200);// select 200 rows at random from table
+        System.out.println("rows.print() = " + rows.print());
+        System.out.println("result.rowCount() = " + rows.rowCount());
+
+
+        for (Row row : bushTable) {
+//            System.out.println("row.getDate(0) = " +row.getDate(0) + "row.getString(1) = " + row.getInt(1));
+        }
+
+        bushTable.stream()
+                .forEach(
+                        row -> {
+                            System.out.println("row.getDate(0) = " + row.getDate(0) + "row.getString(1) = " + row.getInt(1));
+                        }
+                );
+
+        // sampleN로 가져온 값중 가장 큰값 가져오기
+        OptionalDouble max = rows.stream().mapToDouble(row -> row.getInt(1)).max();
+        System.out.println("max = " + max);
+
+
+        Consumer<Row[]> consumer = rows1 -> {
+            System.out.println("====================================================");
+            OptionalDouble
+                    max1 = Arrays
+                            .stream(rows1)
+                            .mapToDouble(row -> {
+                                System.out.println("row = " + row);
+                                return row.getInt(1);
+                            }).max();
+            
+            System.out.println("max1 = " + max1);
+            System.out.println("rows1 = " + rows1.length);
+        };
+
+
+        //        // Consumer prints out the max of a window.
+//        Consumer<Row[]> consumer =
+//                ()->{ rows -> System.out.println(Arrays.stream(rows).mapToDouble(row -> row.getDouble(1)).max())};
+//
+        // Streams over rolling sets of rows. I.e. 0 to n-1, 1 to n, 2 to n+1, etc.
+        // 3개의 범위
+//        bushTable.rollingStream(bushTable.rowCount()).forEach(consumer);
+        bushTable.rollingStream(3).forEach(consumer);
+        System.out.println("====================================================");
+        
+        // Streams over stepped sets of rows. I.e. 0 to n-1, n to 2n-1, 2n to 3n-1, etc. Only returns
+        // full sets of rows.
+//        bushTable.steppingStream(5).forEach(consumer);
+//        System.out.println("bushTable.printAll() = " + bushTable.printAll());
     }
 
     /**
@@ -45,20 +140,78 @@ public class TableSawStartTable {
      * 예를 들어, 분산형 차트에서 해당 값을 사용하려면 반환된 값을 NumberColumn으로 캐스팅해야 합니다.
      */
     private void GettingSpecificColumnTypesFromTable() {
-        bushTable.column("date"); // returns the column named 'date' if it's in the table.
-        // or
-        bushTable.column(0); // returns the first column
-        
-        DateColumn dc = (DateColumn) bushTable.column(0);
+//        bushTable.column("date"); // returns the column named 'date' if it's in the table.
+//        // or
+//        bushTable.column(0); // returns the first column
+//
+//        DateColumn dc = (DateColumn) bushTable.column(0);
+//
+//        System.out.println("dc = " + dc);
+//
+    }
 
-        System.out.println("dc = " + dc);
-        
+    private void WorkingColumns() {
+
+        int i = bushTable.rowCount();
+        String[] animals = {"bear", "cat", "giraffe"};
+
+        String[] adds = new String[i];
+
+        for (int j = 0; j < animals.length; j++) {
+            adds[j] = animals[j];
+        }
+
+        bushTable.addColumns(StringColumn.create("Animal types", adds));
+        List<String> columnNames = bushTable.columnNames(); // returns all column names
+        List<Column<?>> columns = bushTable.columns(); // returns all the columns in the table
+
+
+        System.out.println(bushTable.printAll());
+        for (String columnName : columnNames) {
+            System.out.println("columnName = " + columnName);
+        }
+        System.out.println("====================================================");
+
+        // 해당 컬럼 삭제
+//        bushTable.removeColumns("who"); // keep everything but "foo"
+        // 해당 컬럼만 남기고 삭제
+//        bushTable.retainColumns("who", "date"); // only keep who and date
+        // 비어있는 값이 있는 컬럼은 삭제함
+        bushTable.removeColumnsWithMissingValues();
+
+        columnNames = bushTable.columnNames(); // returns all column names
+
+        for (String columnName : columnNames) {
+            System.out.println("columnName = " + columnName);
+        }
+
+        System.out.println("====================================================");
+        System.out.println("columns.size() = " + columns.size());
+
+        System.out.println("columns.get(0).copy().asList() = " + columns.get(0).copy().asList());
+        // adding columns
+
+
+        // 데이터 정렬
+        columns.get(0).sortAscending();
+
+        Column<?> objects = columns.get(0);
+
+        StringColumn stringColumn = objects.asStringColumn();
+        stringColumn.setName("date2");
+        String s = stringColumn.get(stringColumn.size() - 1);
+        s = "test";
+        bushTable.addColumns(stringColumn);
+        // 컬럼이름은 중복하면 오류남
+        // copy해서 동일 컬럼 생성 가능
+        bushTable.addColumns(columns.get(0).copy().setName("test3"));
+        System.out.println("bushTable.printAll() = " + bushTable.first(5));
     }
 
     /**
      * Working with a table’s columns
      */
-    private void WorkingColumns() {
+    private void WorkingColumns01() {
 
         List<String> strings = bushTable.columnNames();
         for (String string : strings) {
@@ -83,9 +236,9 @@ public class TableSawStartTable {
         }
         // Tablesaw에서 열 이름은 대소문자를 구분하지 않습니다. 다음 중 하나를 요청하면 동일한 열을 얻게 됩니다.
 
-        System.out.println("columns = " + bushTable.column("wHo")+ columns);
-        System.out.println("columns = " + bushTable.column("whO")+ columns);
-        System.out.println("columns = " + bushTable.column("Who")+ columns);
+        System.out.println("columns = " + bushTable.column("wHo") + columns);
+        System.out.println("columns = " + bushTable.column("whO") + columns);
+        System.out.println("columns = " + bushTable.column("Who") + columns);
 
         bushTable.stream().forEach(x -> {
             List<String> strings1 = x.columnNames();
