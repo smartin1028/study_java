@@ -1,11 +1,10 @@
 package org.study.green.javautil;
 
+import lombok.Data;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.Assert.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SetGreenTest {
 
@@ -55,5 +54,41 @@ public class SetGreenTest {
 
         System.out.println("array.length = " + array.length);
 
+    }
+
+    @Test
+    public void t_SetGreenTest_true_00() {
+        List<Person> peopleWithDuplicates = Arrays.asList(
+                new Person(1, "John"),
+                new Person(2, "Jane"),
+                new Person(1, "Jack"),
+                new Person(2, "Jill"),
+                new Person(3, "Jill")
+        );
+
+        Map<Integer, Person> peopleWithoutDuplicates = peopleWithDuplicates.stream()
+                .collect(Collectors.toMap(
+                        per -> per.getId(),      // 키 추출 함수
+                        person -> person,   // 값 추출 함수
+                        (existingValue, newValue) -> existingValue  // 두 값이 충돌할 때 사용할 병합 함수
+                ));
+
+        List<Person> listWithoutDuplicates = new ArrayList<>(peopleWithoutDuplicates.values());
+
+        for (Person listWithoutDuplicate : listWithoutDuplicates) {
+            System.out.println("listWithoutDuplicate = " + listWithoutDuplicate);
+        }
+
+    }
+
+    @Data
+    private class Person {
+        private int id;
+        private String name;
+
+        public Person(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
     }
 }
