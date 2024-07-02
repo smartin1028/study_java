@@ -32,7 +32,6 @@ public class TableSawDB {
 
         Connection con = null;
         try {
-//             jdbc:mariadb://152.70.85.167:23306/schema_test
             String formatUrl = "jdbc:mariadb://%s:%s/%s";
 
             String url = String.format(formatUrl, mysqlHost, port, schema);
@@ -41,7 +40,6 @@ public class TableSawDB {
             Class.forName("org.mariadb.jdbc.Driver");
             con = DriverManager.getConnection(url, user, password);
             System.out.println("Successfully connected to MySQL database");
-
 
             StringBuilder sb = new StringBuilder();
 
