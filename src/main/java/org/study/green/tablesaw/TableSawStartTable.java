@@ -1,18 +1,16 @@
 package org.study.green.tablesaw;
 
 import org.study.green.resource.ResourceUtils;
-import tech.tablesaw.api.*;
+import org.study.green.utils.FileUtil;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
-import tech.tablesaw.selection.Selection;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.function.Consumer;
 
@@ -313,7 +311,7 @@ public class TableSawStartTable {
         System.out.println(cuteAnimals.first(1));
 
 
-        cuteAnimals.write().csv(ResourceUtils.getResourcePath() + "bush.csv");
+        cuteAnimals.write().csv(FileUtil.appendPath(ResourceUtils.getResourcePath() , "bush.csv"));
 
         File file = new File("file.txt");
         String absolutePath = file.getAbsolutePath();

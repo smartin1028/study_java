@@ -1,16 +1,14 @@
 package org.study.green.resource;
 
-import java.io.IOException;
+import org.study.green.utils.FileUtil;
 
 public class ResourceUtils {
 
     /**
      * /~.../study_java/target/classes/
-     *
-     * @return
      */
     public static String getClassResourcePath() {
-        return ResourceUtils.class.getClassLoader().getResource("./").getPath();
+        return ResourceUtils.class.getClassLoader().getResource(FileUtil.convertFilePath("./")).getPath();
     }
 
     public static String getRootPath() {
@@ -18,11 +16,15 @@ public class ResourceUtils {
     }
 
     public static String getResourcePath() {
-        return String.format("%s/%s", getRootPath(), "src/main/resources/");
+        return FileUtil.appendPath(getRootPath(), FileUtil.convertFilePath("src/main/resources"));
     }
 
-    public static void main(String[] args) throws IOException {
-        System.out.println("resourcePath = " + ResourceUtils.getClassResourcePath());
-        System.out.println("project root path = " + ResourceUtils.getRootPath());
+    /**
+     * test resources 위치 return
+     * @return
+     */
+    public static String getResourceTestPath() {
+        return FileUtil.appendPath( getRootPath(), FileUtil.convertFilePath("src/test/resources"));
     }
+
 }
