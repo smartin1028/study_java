@@ -42,3 +42,5 @@ build/
 *.csv
 
 src/main/resources/.env
+
+logs
