@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 
 public class LoggerTest {
 
-
-    // SLF4J 로거 인스턴스 생성
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Test
     public void t_LoggerTest_true_00() {
+    	
+    	// eclipse에서 test resources는 생성이 안되게 막혀있음
 
         // 다양한 로그 레벨 사용
         logger.trace("TRACE 레벨 메시지");
@@ -26,10 +26,10 @@ public class LoggerTest {
         logger.info("파라미터 예제: name={}, value={}", name, value);
 
         // 예외 로깅
-        try {
-            throw new RuntimeException("테스트 예외");
-        } catch (Exception e) {
-            logger.error("에러 발생", e);
-        }
+//        try {
+//            throw new RuntimeException("테스트 예외");
+//        } catch (Exception e) {
+//            logger.error("에러 발생", e);
+//        }
     }
 }
