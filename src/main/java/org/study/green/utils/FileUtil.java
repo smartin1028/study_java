@@ -4,11 +4,18 @@ import java.io.File;
 
 public class FileUtil {
 
+    public static final String SEPARATOR = File.separator;
+
     public static String convertFilePath(String filePath) {
-        return filePath.replaceAll("/", File.separator).replaceAll("\\\\", File.separator);
+        String separator = SEPARATOR;
+        separator += separator;
+        String s = filePath.replaceAll("/", separator);
+        return s.replaceAll("\\\\", separator);
     }
 
     public static String appendPath(String... pathNames) {
-        return String.join(File.separator, pathNames);
+        return String.join(SEPARATOR, pathNames);
     }
+
+
 }
