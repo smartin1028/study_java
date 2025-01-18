@@ -4,16 +4,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class AggregateFunctionsTest {
-    public static void main(String[] args) {
 
-        AggregateFunctionsTest functionsTest = new AggregateFunctionsTest();
-        functionsTest.arrTest();
-        functionsTest.ArrayListTest();
-        functionsTest.bigDecimalTest();
-
-    }
-
-    private void bigDecimalTest() {
+    public void bigDecimalTest() {
         System.out.println("AggregateFunctionsTest.bigDecimalTest");
         List<BigDecimal> numbers = Arrays.asList(
                 new BigDecimal("1"),

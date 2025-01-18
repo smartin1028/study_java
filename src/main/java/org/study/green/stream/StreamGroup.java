@@ -33,7 +33,7 @@ public class StreamGroup {
         });
     }
 
-    private void groupTest02() {
+    public void groupTest02() {
         List<Person> peopleList = getPeopleList();
 
         Map<City, Set<String>>
@@ -52,7 +52,7 @@ public class StreamGroup {
         });
     }
 
-    private List<Person> getPeopleList() {
+    public List<Person> getPeopleList() {
 
         List<Person> people = new ArrayList<>();
 
@@ -81,7 +81,7 @@ public class StreamGroup {
         return people;
     }
 
-    private void groupTest01() {
+    public void groupTest01() {
         List<Person> list = Arrays.asList(
                 new Person("John", 20),
                 new Person("Jane", 30),
@@ -98,9 +98,5 @@ public class StreamGroup {
         });
     }
 
-    public static void main(String[] args) {
-        StreamGroup streamGroup = new StreamGroup();
-//        streamGroup.groupTest01();
 
-    }
 }

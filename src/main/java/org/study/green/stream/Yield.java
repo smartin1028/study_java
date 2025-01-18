@@ -1,6 +1,5 @@
 package org.study.green.stream;
 
-import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,10 +38,6 @@ public class Yield {
         System.out.println("put = " + put);
 
         IntStream.range(0, 5).forEach(System.out::println);
-    }
-
-    public static void main(String[] args) {
-        new Yield();
     }
 
 }

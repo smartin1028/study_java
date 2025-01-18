@@ -14,23 +14,14 @@ public class PrintOut {
         System.out.println();
     }
 
-    public static void main(String[] args) {
-        PrintOut printOut = new PrintOut();
-
-        printOut.strTest();
-        printOut.intTest();
-
-    }
-
-    private void intTest() {
+    public void intTest() {
         int test = 31;
         String format = String.format("%05d", test);
         System.out.println(format);
 
     }
 
-    private void strTest() {
-
+    public void strTest() {
         String test = "31";
         String format = StrUtil.fillZeroString(test, 5 , true);
         System.out.println(format);

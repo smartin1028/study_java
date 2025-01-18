@@ -1,7 +1,19 @@
 package org.study.green.stream;
 
-import junit.framework.TestCase;
 
-public class AggregateFunctionsTestTest extends TestCase {
+import org.junit.Test;
+
+public class AggregateFunctionsTestTest {
+
+
+    @Test
+    public void mainTest() {
+        AggregateFunctionsTest functionsTest = new AggregateFunctionsTest();
+        functionsTest.arrTest();
+        functionsTest.ArrayListTest();
+        functionsTest.bigDecimalTest();
+
+
+    }
 
 }

@@ -7,7 +7,7 @@ public class SystemInfo {
         StringIdentityHashCodeCheck();
     }
 
-    private void StringIdentityHashCodeCheck() {
+    public void StringIdentityHashCodeCheck() {
         int identityHashCode01 = getIdentityHashCode("1");
         System.out.println("identityHashCode01 = " + identityHashCode01);
         int identityHashCode02 = getIdentityHashCode("1");
@@ -50,8 +50,5 @@ public class SystemInfo {
         return System.identityHashCode(x);
     }
 
-    public static void main(String[] args) {
-        new SystemInfo();
 
-    }
 }

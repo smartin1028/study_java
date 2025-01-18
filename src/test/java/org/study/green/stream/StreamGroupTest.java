@@ -12,6 +12,11 @@ import static org.junit.Assert.*;
 
 public class StreamGroupTest {
 
+    @Test
+    public void maintest() {
+        StreamGroup streamGroup = new StreamGroup();
+    }
+
     private List<Person> getPeopleList() {
 
         List<Person> people = new ArrayList<>();

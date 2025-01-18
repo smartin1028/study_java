@@ -1,10 +1,13 @@
-package org.study.green.str;
+package org.study.green.utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Base64;
 
+/**
+ * 암복호화 Util
+ */
 public class MyEncryptDecrypt {
 
     private static final String ALGORITHM = KeyInfo.ALGORITHM;
@@ -28,15 +31,4 @@ public class MyEncryptDecrypt {
         return new String(decryptedBytes);
     }
 
-    public static void main(String[] args) throws Exception {
-        System.out.println("KEY = " + KEY.length);
-
-        String text = "암호화 테스트";
-        String encryptedText = encrypt(text);
-        String decryptedText = decrypt(encryptedText);
-
-        System.out.println("원본 데이터: " + text);
-        System.out.println("암호화된 데이터: " + encryptedText);
-        System.out.println("복호화된 데이터: " + decryptedText);
-    }
 }
