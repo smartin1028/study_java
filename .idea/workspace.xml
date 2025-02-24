@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="24f1cf4b-a7a1-4782-919b-c03511873c7f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/App.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/OriginalIndexSorting.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/Chooser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/Chooser01.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/DelayedItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/GenericBox.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/MainBox.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/OldTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/Stack.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/Stack01.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/generics/T1.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/javautil/SetGreen.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/num/BigDecimalExamples.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/num/BigDecimalPlainStringExample.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/num/ExponentExample.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/num/PivotExample.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/resource/ResourceUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/str/PrintOut.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/str/StrUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/stream/AggregateFunctionsTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/stream/StreamGroup.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/stream/Yield.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/stream/vo/City.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/stream/vo/Person.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/sys/SystemInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/tablesaw/TableSawDB.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/tablesaw/TableSawGroupBy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/tablesaw/TableSawStart.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/tablesaw/TableSawStartTable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/tablesaw/TableSawStartTableWhere.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/tablesaw/TableSawTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/utils/DateUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/utils/FileUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/utils/KeyInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/utils/MyEncryptDecrypt.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/utils/PropertiesUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/study/green/utils/TableSawUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/logback.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/AppTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/javautil/SetGreenTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/javautil/StringTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/resource/ResourceUtilsTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/str/MyEncryptDecryptTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/str/PrintOutTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/stream/AggregateFunctionsTestTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/stream/StreamGroupTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/stream/YieldTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/sys/SystemInfoTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/tablesaw/TableSawGroupByTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/utils/DateUtilsTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/utils/FileUtilTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/utils/KeyInfoTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/utils/PropertiesUtilsTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/study/green/utils/TableSawUtilTest.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2tUAOVHdx8EtjE0UlFojrk9JJQL" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-33fa658e685a-intellij.indexing.shared.core-IU-251.20015.29" />
+        <option value="bundled-js-predefined-d6986cc7102b-4027fba43365-JavaScript-IU-251.20015.29" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="24f1cf4b-a7a1-4782-919b-c03511873c7f" name="Changes" comment="" />
+      <created>1740396250657</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1740396250657</updated>
+      <workItem from="1740396253586" duration="28000" />
+    </task>
+    <servers />
+  </component>
+</project>
