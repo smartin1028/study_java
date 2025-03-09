@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="24f1cf4b-a7a1-4782-919b-c03511873c7f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spring_test/TaoTree/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/spring_test/TaoTree/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spring_test/TaoTree/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/spring_test/TaoTree/pom.xml" afterDir="false" />
-    </list>
+    <list default="true" id="24f1cf4b-a7a1-4782-919b-c03511873c7f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -72,6 +66,7 @@
   "keyToString": {
     "Docker.TaoTree/Dockerfile (1).executor": "Run",
     "Docker.TaoTree/Dockerfile.executor": "Run",
+    "Docker.TaoTree/Dockerfile: Compose Deployment.executor": "Run",
     "Maven.tao [clean].executor": "Run",
     "Maven.tao [compile].executor": "Run",
     "Maven.tao [install].executor": "Run",
@@ -108,7 +103,7 @@
       <recent name="$PROJECT_DIR$/spring_test/TaoTree/scripts" />
     </key>
   </component>
-  <component name="RunManager" selected="Docker.TaoTree/Dockerfile: Compose Deployment">
+  <component name="RunManager">
     <configuration name="TaoTreeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="tao" />
@@ -162,7 +157,7 @@
       <workItem from="1740396253586" duration="28000" />
       <workItem from="1741439377154" duration="8136000" />
       <workItem from="1741477731364" duration="5640000" />
-      <workItem from="1741493096837" duration="6579000" />
+      <workItem from="1741493096837" duration="7051000" />
     </task>
     <servers />
   </component>
