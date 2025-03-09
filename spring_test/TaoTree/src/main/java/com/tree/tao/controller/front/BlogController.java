@@ -1,4 +1,4 @@
-package com.tree.tao.controller;
+package com.tree.tao.controller.front;
 
 import com.tree.tao.dto.BlogDto;
 import com.tree.tao.entity.Blog;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -30,7 +28,7 @@ public class BlogController {
     public String list(Model model) {
         // 블로그 글 목록 조회
         List<Blog> blogs = blogService.findAll();
-        List<BlogDto.SearchVo> posts = blogs.stream().map(BlogDto.SearchVo::convertData).toList();
+        List<BlogDto.SearchVo> posts = blogs.stream().map(map -> modelMapper.map(map, BlogDto.SearchVo.class)).toList();
         model.addAttribute("posts", posts); // "posts"라는 이름으로 데이터 추가
         return "blog/list";
     }

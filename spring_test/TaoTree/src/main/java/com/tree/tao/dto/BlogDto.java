@@ -41,4 +41,17 @@ public class BlogDto {
         private String author;
         private LocalDateTime createdAt;
     }
+
+
+    @Data
+    public static class ReturnVo{
+        private Long id;
+
+        private String title;
+        private String content;
+        private String author;
+
+        private LocalDateTime createdAt;
+    }
+
 }
