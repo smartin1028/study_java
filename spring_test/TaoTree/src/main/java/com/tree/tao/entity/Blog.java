@@ -1,5 +1,6 @@
 package com.tree.tao.entity;
 
+import com.tree.tao.utils.MyEncryptDecrypt;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,4 +23,21 @@ public class Blog {
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+
+    public String getContent() {
+        try {
+            return MyEncryptDecrypt.decrypt(content);
+        } catch (Exception e) {
+            return content;
+        }
+    }
+
+    public void setContent(String content) {
+        try {
+            this.content = MyEncryptDecrypt.encrypt(content);
+        } catch (Exception e) {
+            this.content = content;
+        }
+    }
 }
