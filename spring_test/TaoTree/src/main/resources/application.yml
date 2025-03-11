@@ -2,53 +2,14 @@ spring:
   application:
     name: TaoTree
 
-  devtools:
-    restart:
-      enabled: false
-      exclude: static/**,public/**,templates/**
-
-  jpa:
-    hibernate:
-      # 테이블 기본 생성 설정
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-#        format_sql: true
-        
-  # database 설정 연결
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: true
-      multiline: true
-      logging: slf4j
-      # 줄바꿈 \n 사용안됨
-      log-file: logs/spy.log
-#      log-format: '%(currentTime)|%(executionTime)|%(category)|connection%(connectionId)|%(sql)'
-
-
-logging:
-  level:
-    root: INFO
-    org.springframework: INFO
-    org.hibernate: INFO
-    p6spy: INFO
-  file:
-    name: logs/app.log
-  logback:
-    rollingpolicy:
-      file-name-pattern: logs/application-%d{yyyy-MM-dd}-%i.log
-      max-file-size: 10MB
-      max-history: 30
-      total-size-cap: 3GB
+  profiles:
+    include:
+      # 상수관련
+      - constants
+    group:
+      # 환경이 적용되는 application-common, application-database 설정정보
+      default: common, database
+      # TODO 추후 적용
+      dev: dev-common, dev-database
+      # 공개하지 않음
+      prod: prod-common,prod-database
