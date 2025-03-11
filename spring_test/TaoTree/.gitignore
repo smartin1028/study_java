@@ -239,3 +239,5 @@ local.properties
 
 /logs
 /scripts
+
+src/main/resources/application-prod*
