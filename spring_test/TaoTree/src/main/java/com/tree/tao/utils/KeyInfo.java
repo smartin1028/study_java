@@ -1,6 +1,7 @@
 package com.tree.tao.utils;
 
 import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * 암복호화 관련 객체
@@ -12,6 +13,7 @@ public class KeyInfo {
 
     /**
      * 암호화 key 랜덤 생성
+     *
      * @return 생성된 암호화 key
      */
     public static byte[] generateAESKey() {
@@ -21,4 +23,11 @@ public class KeyInfo {
         return key;
     }
 
+    /**
+     * 생성된 암호화키를 문자열로 반환
+     * @return 생성된 암호화키를 문자열로 반환
+     */
+    public static String getGenerateAESKeyToString() {
+        return Base64.getEncoder().encodeToString(generateAESKey());
+    }
 }

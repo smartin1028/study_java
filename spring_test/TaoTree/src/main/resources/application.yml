@@ -1,15 +1,10 @@
 spring:
   application:
     name: TaoTree
-
   profiles:
-    include:
-      # 상수관련
-      - constants
-    group:
-      # 환경이 적용되는 application-common, application-database 설정정보
-      default: common, database
-      # TODO 추후 적용
-      dev: dev-common, dev-database
-      # 공개하지 않음
-      prod: prod-common,prod-database
+    active:
+      - local
+  config:
+    import:
+      - optional:classpath:/config/common/common.yml
+      - optional:classpath:/config/common/constants.yml

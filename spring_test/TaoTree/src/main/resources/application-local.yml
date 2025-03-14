@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: TaoTree
+  config:
+    activate:
+      on-profile: local
+# 아래 import 설정은 이곳에서 확인
+# https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.files.profile-specific
+# spring.config.import=optional:file:./dev.properties
+    import:
+      - optional:classpath:/config/local/database.yml
+    location: config

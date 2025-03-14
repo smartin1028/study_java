@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: TaoTree
+  config:
+    activate:
+      on-profile: dev
+    import:
+      - optional:classpath:/config/dev/database.yml
+    location: config

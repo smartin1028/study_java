@@ -241,3 +241,6 @@ local.properties
 /scripts
 
 src/main/resources/application-prod*
+
+.env
+/src/main/resources/config/prod
