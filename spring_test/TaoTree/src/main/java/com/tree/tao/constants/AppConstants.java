@@ -20,4 +20,7 @@ public class AppConstants {
 
     @Value("${app.constants.api-version}")
     private String apiVersion;
+
+    @Value("${spring.datasource.username}")
+    String username;
 }
