@@ -3,3 +3,8 @@ app:
     max-file-size: 5242880
     allowed-file-types: jpg,png,pdf
     api-version: v1
+
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Seoul
