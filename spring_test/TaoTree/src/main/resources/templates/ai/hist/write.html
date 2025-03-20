@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: header}"></head>
+<body>
+<div class="container mt-5">
+    <div class="container mt-5">
+        <h2>글 등록</h2>
+        <form th:action="@{/blog/write}" method="post">
+            <div class="mb-3">
+                <label for="title" class="form-label">제목</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">내용</label>
+                <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="author" class="form-label">작성자</label>
+                <input type="text" class="form-control" id="author" name="author" required>
+            </div>
+            <button type="submit" class="btn btn-primary">등록</button>
+            <a href="/posts" class="btn btn-secondary">취소</a>
+        </form>
+    </div>
+</div>
+<div th:replace="~{layout/footer :: footer}"></div>
+</body>
+</html>
