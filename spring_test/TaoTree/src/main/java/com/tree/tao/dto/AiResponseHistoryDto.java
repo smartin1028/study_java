@@ -37,4 +37,20 @@ public class AiResponseHistoryDto {
                 .userId(createVo.getUserId())
                 .build();
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SearchVo {
+        private Long id;
+        private String prompt;      // 사용자 입력 프롬프트
+        private String response;    // AI 응답 내용
+        private String model;       // 사용된 AI 모델명
+        private Integer tokenCount; // 사용된 토큰 수
+        private String status;      // 응답 상태 (성공/실패)
+        private Long processingTime; // 처리 소요 시간 (ms)
+        private String userId;      // 사용자 ID
+    }
+
 }
