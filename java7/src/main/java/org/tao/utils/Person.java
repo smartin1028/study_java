@@ -1,4 +1,4 @@
-package org.example;
+package org.tao.utils;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
