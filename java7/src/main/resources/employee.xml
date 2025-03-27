@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<employees>
+    <employee id="1">
+        <name>홍길동</name>
+        <position>개발자</position>
+        <department>IT</department>
+    </employee>
+    <employee id="2">
+        <name>김철수</name>
+        <position>디자이너</position>
+        <department>디자인</department>
+    </employee>
+    <employee id="3">
+        <name>이영희</name>
+        <position>매니저</position>
+        <department>운영</department>
+    </employee>
+</employees>
