@@ -21,7 +21,7 @@ set PROJECT_HOME=%CD%
 rem Maven 홈 디렉토리 설정 (필요한 경우 경로 수정)
 set MAVEN_HOME=C:\Program Files\Apache Maven\apache-maven-3.8.8
 rem Java 홈 디렉토리 설정 (필요한 경우 경로 수정)
-set JAVA_HOME=C:\Program Files\Java\corretto-1.8.0_442
+set JAVA_HOME=C:\Program Files\Java\corretto-11.0.26
 
 rem # 여러 중첩 폴더 한번에 생성
 rem PATH에 Maven 추가
@@ -47,7 +47,6 @@ if %ERRORLEVEL% EQU 0 (
 ) else (
     echo Maven 빌드 중 오류가 발생했습니다.
 )
-
 rem 여러 파일 복사
 xcopy /Y /I "%PROJECT_HOME%\target\*.jar" "%TARGET_DIR%"
 

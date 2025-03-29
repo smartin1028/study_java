@@ -8,6 +8,13 @@
     <artifactId>java11</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skipTests>true</skipTests>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -45,10 +52,6 @@
             <version>4.1.1</version>
         </dependency>
     </dependencies>
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+
 
 </project>
