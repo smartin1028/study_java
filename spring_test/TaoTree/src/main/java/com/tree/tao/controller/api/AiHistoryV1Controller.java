@@ -35,11 +35,11 @@ public class AiHistoryV1Controller {
     @GetMapping("/ai_history/v1/{id}")
     public ResponseEntity<Object> getBlog(@PathVariable Long id) {
         Optional<AiResponseHistory> byId = repository.findById(id);
-        BlogDto.ReturnVo returnVo;
+        AiResponseHistoryDto.SearchVo returnVo;
         Map<String, Object> response = new HashMap<>();
         if (byId.isPresent()) {
 //            returnVo = BlogDto.ReturnVo.convertData(byId.get());
-            returnVo = modelMapper.map(byId, BlogDto.ReturnVo.class);
+            returnVo = modelMapper.map(byId, AiResponseHistoryDto.SearchVo.class);
             response.put("data", returnVo);
             response.put("status", "success");
         }else{
