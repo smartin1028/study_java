@@ -9,6 +9,7 @@ public class Oracle {
     public static Connection getConnection() {
         DBConnectionVo dbConnectionVo = new DBConnectionVo();
         DBType oracle = DBType.ORACLE;
+        dbConnectionVo.setEtc1(":XE");
         // JDBC 연결 정보
         String jdbcUrl = DBConnectionVo.getJdbcUrl(dbConnectionVo, oracle);
         String username = dbConnectionVo.getUsername();

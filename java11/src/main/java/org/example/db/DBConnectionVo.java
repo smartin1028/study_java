@@ -6,7 +6,7 @@ public class DBConnectionVo {
     private int port = 1521;
     private String username = "username";
     private String password = "password";
-    private String etc1 = ":XE";
+    private String etc1 = "";
 
 
     public DBConnectionVo() {
