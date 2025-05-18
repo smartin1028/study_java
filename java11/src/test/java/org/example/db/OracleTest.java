@@ -6,12 +6,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static org.junit.Assert.*;
 
 public class OracleTest {
 
     @Test
     public void t_OracleTest_true_00() {
+        // 기본 properties info
+        // -Ddb_ip=localhost -Ddb_port=1521 -Ddb_id=system -Ddb_password=password
 
         System.out.println("Oracle DB에 연결중");
         try (Connection conn = Oracle.getConnection(); Statement stmt = conn.createStatement()) {

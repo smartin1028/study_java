@@ -10,6 +10,8 @@ public class SqlServerTest {
 
     @Test
     public void t_SqlServerTest_true_00() {
+        // 기본 properties info
+        // -Ddb_ip=localhost -Ddb_port=1433 -Ddb_id=SA -Ddb_password=password
 
         System.out.println("SqlServer DB에 연결중");
         try (Connection conn = SqlServer.getConnection(); Statement stmt = conn.createStatement()) {
