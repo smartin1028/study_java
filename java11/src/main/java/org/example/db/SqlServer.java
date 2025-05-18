@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 
-public class Oracle {
+public class SqlServer {
 
     public static Connection getConnection() {
         DBConnectionVo dbConnectionVo = new DBConnectionVo();
-        DBType oracle = DBType.ORACLE;
+        dbConnectionVo.setEtc1("");
+
+        DBType oracle = DBType.SQL_SERVER;
         // JDBC 연결 정보
         String jdbcUrl = DBConnectionVo.getJdbcUrl(dbConnectionVo, oracle);
         String username = dbConnectionVo.getUsername();

@@ -19,8 +19,9 @@ echo TARGET_JAR=%TARGET_JAR%
 
 cd %TARGET_DIR%
 
-%JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;" org.example.CommandMain
-%JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;%TARGET_DIR%\libs\*" org.example.mssql.DatabaseConnection
+rem %JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;" org.example.Main
+%JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;%TARGET_DIR%\libs\*" org.example.Main
+rem %JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;%TARGET_DIR%\libs\*" org.example.mssql.DatabaseConnection
 
 
 endlocal

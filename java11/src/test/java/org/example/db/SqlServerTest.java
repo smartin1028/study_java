@@ -6,19 +6,17 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static org.junit.Assert.*;
-
-public class OracleTest {
+public class SqlServerTest {
 
     @Test
-    public void t_OracleTest_true_00() {
+    public void t_SqlServerTest_true_00() {
 
         System.out.println("Oracle DB에 연결중");
-        try (Connection conn = Oracle.getConnection(); Statement stmt = conn.createStatement()) {
+        try (Connection conn = SqlServer.getConnection(); Statement stmt = conn.createStatement()) {
 
             System.out.println("Oracle DB에 연결 완료");
             try (// 데이터 조회
-                 ResultSet rs = stmt.executeQuery("SELECT 'hello' str FROM dual")) {
+                 ResultSet rs = stmt.executeQuery("SELECT 'hello' str")) {
                 while (rs.next()) {
                     System.out.println("str: " + rs.getString("str"));
                 }

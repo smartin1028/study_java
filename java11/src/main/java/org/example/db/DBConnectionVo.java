@@ -10,10 +10,12 @@ public class DBConnectionVo {
 
 
     public DBConnectionVo() {
-        this.ip = System.getProperty("oracle_db_ip", "localhost");
-        this.port = Integer.parseInt(System.getProperty("oracle_db_port", "1521"));
-        this.username = System.getProperty("oracle_db_id", "id");
-        this.password = System.getProperty("oracle_db_password", "password");
+        this.ip = System.getProperty("db_ip", "localhost");
+        this.port = Integer.parseInt(System.getProperty("db_port", "1521"));
+        this.username = System.getProperty("db_id", "id");
+        this.password = System.getProperty("db_password", "password");
+
+        System.out.println(this);
     }
 
     /**
