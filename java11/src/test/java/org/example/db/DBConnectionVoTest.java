@@ -1,8 +1,8 @@
 package org.example.db;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
+import org.tao.utils.db.DBConnectionVo;
+import org.tao.utils.db.DBType;
 
 public class DBConnectionVoTest {
 

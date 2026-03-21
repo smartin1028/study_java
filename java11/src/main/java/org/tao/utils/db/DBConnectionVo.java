@@ -1,4 +1,4 @@
-package org.example.db;
+package org.tao.utils.db;
 
 
 public class DBConnectionVo {

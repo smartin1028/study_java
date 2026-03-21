@@ -4,7 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="24f1cf4b-a7a1-4782-919b-c03511873c7f" name="Changes" comment="" />
+    <list default="true" id="24f1cf4b-a7a1-4782-919b-c03511873c7f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/scripts/java_command_run.bat" beforeDir="false" afterPath="$PROJECT_DIR$/java11/scripts/java_command_run.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/Person.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/Person.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/db/DBConnectionVo.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/utils/db/DBConnectionVo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/db/DBType.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/utils/db/DBType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/db/Oracle.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/utils/db/Oracle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/db/SqlServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/utils/db/SqlServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/mssql/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/utils/mssql/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/main/java/org/example/mssql/MySqlSessionSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/main/java/org/tao/utils/mssql/MySqlSessionSql.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/test/java/org/example/PersonTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/test/java/org/example/PersonTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/test/java/org/example/db/DBConnectionVoTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/test/java/org/example/db/DBConnectionVoTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/test/java/org/example/db/OracleTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/test/java/org/example/db/OracleTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/test/java/org/example/db/SqlServerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/test/java/org/example/db/SqlServerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/test/java/org/example/mssql/DatabaseConnectionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/test/java/org/example/mssql/DatabaseConnectionTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java11/src/test/java/org/example/mssql/MySqlSessionSqlTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/java11/src/test/java/org/example/mssql/MySqlSessionSqlTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java7/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/java7/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spring_test/TaoTree/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/spring_test/TaoTree/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spring_test/TaoTree/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/spring_test/TaoTree/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spring_test/TaoTree/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/spring_test/TaoTree/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spring_test/TaoTree/src/main/resources/config/common/constants.yml" beforeDir="false" afterPath="$PROJECT_DIR$/spring_test/TaoTree/src/main/resources/config/common/constants.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,6 +35,9 @@
   </component>
   <component name="ComposerSettings">
     <execution />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="413" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -30,12 +56,12 @@
     &quot;assignee&quot;: &quot;smartin1028&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/smartin1028/study_java.git&quot;,
-    &quot;accountId&quot;: &quot;5d5f7f63-48c7-433a-9f7b-2d8e7ada0385&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:smartin1028/study_java.git",
+    "accountId": "5d5f7f63-48c7-433a-9f7b-2d8e7ada0385"
   }
-}</component>
+}]]></component>
   <component name="JpbToolWindowState">
     <option name="isToolWindowVisible" value="false" />
   </component>
@@ -50,6 +76,11 @@
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.5.1_2/bin/php" />
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
@@ -76,13 +107,18 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.TaoTreeApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/daewonlee/dev/git/repos/study_java/spring_test/TaoTree/scripts",
+    "last_opened_file_path": "/Users/daewonlee/dev/git/repos/study_java",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -92,18 +128,26 @@
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
     "stardust.markdown.MarkdownSplitEditorSuppressor:keyList": []
   }
 }]]></component>
+  <component name="RecapSpentCounter">
+    <option name="endsOfQuotaMs" value="1775952099571" />
+    <option name="spentUsd" value="0.0026465" />
+  </component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="9" />
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/spring_test/TaoTree/scripts" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Docker.TaoTree/Dockerfile: Compose Deployment">
     <configuration name="TaoTreeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="tao" />
@@ -129,7 +173,9 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile" />
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -142,7 +188,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.25659.59" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
       </set>
     </attachedChunks>
   </component>
@@ -158,6 +205,7 @@
       <workItem from="1741439377154" duration="8136000" />
       <workItem from="1741477731364" duration="5640000" />
       <workItem from="1741493096837" duration="7051000" />
+      <workItem from="1774078909895" duration="1211000" />
     </task>
     <servers />
   </component>

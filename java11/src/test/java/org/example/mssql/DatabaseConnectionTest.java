@@ -1,12 +1,12 @@
 package org.example.mssql;
 
 import org.junit.Test;
+import org.tao.utils.mssql.DatabaseConnection;
+import org.tao.utils.mssql.MySqlSessionSql;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class DatabaseConnectionTest {
 

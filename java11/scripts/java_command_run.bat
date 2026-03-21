@@ -23,5 +23,4 @@ rem %JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;" org.example.Main
 %JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;%TARGET_DIR%\libs\*" org.example.Main
 rem %JAVA_HOME%\bin\java.exe -cp "%TARGET_JAR%;%TARGET_DIR%\libs\*" org.example.mssql.DatabaseConnection
 
-
 endlocal

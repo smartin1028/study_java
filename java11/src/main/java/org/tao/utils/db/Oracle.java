@@ -1,16 +1,15 @@
-package org.example.db;
+package org.tao.utils.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 
-public class SqlServer {
+public class Oracle {
 
     public static Connection getConnection() {
         DBConnectionVo dbConnectionVo = new DBConnectionVo();
-        dbConnectionVo.setEtc1("");
-
-        DBType oracle = DBType.SQL_SERVER;
+        DBType oracle = DBType.ORACLE;
+        dbConnectionVo.setEtc1(":XE");
         // JDBC 연결 정보
         String jdbcUrl = DBConnectionVo.getJdbcUrl(dbConnectionVo, oracle);
         String username = dbConnectionVo.getUsername();
