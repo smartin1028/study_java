@@ -1,0 +1,5 @@
+[
+  {
+    "output": "Based on my search results, I found information about Spotify Technology S.A. (SPOT) stock. Let me provide the financial data in JSON format:\n\n```json\n[\n  {\n    \"company_name\": \"Spotify Technology S.A.\",\n    \"ticker_symbol\": \"SPOT\",\n    \"exchange\": \"NYSE\",\n    \"current_price\": \"731-740 (bid-ask range)\",\"output\": \"Based on my search results, I found information about Spotify Technology S.A. (SPOT) stock. Let me provide the financial data in JSON format:\\n\\n```json\\n[\\n  {\\n    \\\"company_name\\\": \\\"Spotify Technology S.A.\\\",\\n    \\\"ticker_symbol\\\": \\\"SPOT\\\",\\n    \\\"exchange\\\": \\\"NYSE\\\",\\n    \\\"current_price\\\": \\\"731-740 (bid-ask range)\\\",\\n    \\\"52_week_range\\\": \\\"362.31 - 785.00\\\",\\n    \\\"market_cap\\\": \\\"151.23B\\\"\\n  }\\n]\\n```\"\n    \"52_week_range\": \"362.31 - 785.00\",\n    \"market_cap\": \"151.23B\"\n  }\n]\n```"
+  }
+]
