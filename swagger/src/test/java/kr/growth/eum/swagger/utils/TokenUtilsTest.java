@@ -22,4 +22,5 @@ class TokenUtilsTest {
         log.info("Generated bearer token: {}", s);
         log.info("Generated size : {}", s.length());
     }
+
 }
