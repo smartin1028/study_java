@@ -30,11 +30,13 @@ class Settings:
         default_factory=lambda: os.getenv("LLM_BEARER_TOKEN", "")
     )
 
-    # 사용할 LLM 제공자 식별자 ("ollama", 추후 "openai" 등)
+    # 사용할 LLM 제공자 식별자 ("ollama", "deepseek", 추후 "openai" 등)
     # 이 값에 따라 providers/__init__.py 의 팩토리 함수가 적절한 구현체를 반환한다
     llm_provider: str = field(
         default_factory=lambda: os.getenv("LLM_PROVIDER", "ollama")
     )
+
+    # ---- Ollama 설정 ----
 
     # Ollama 서버의 기본 URL (로컬 실행 기준 http://localhost:11434)
     ollama_base_url: str = field(
@@ -45,6 +47,62 @@ class Settings:
     # deepseek-r1:1.5b 는 경량 추론 모델로 로컬 실행에 적합
     ollama_model: str = field(
         default_factory=lambda: os.getenv("OLLAMA_MODEL", "deepseek-r1:1.5b")
+    )
+
+    # ---- DeepSeek API 설정 ----
+
+    # DeepSeek API 인증 키 (https://platform.deepseek.com 에서 발급)
+    deepseek_api_key: str = field(
+        default_factory=lambda: os.getenv("DEEPSEEK_API_KEY", "")
+    )
+
+    # DeepSeek 기본 모델
+    # deepseek-v4-flash: 빠른 응답, 비용 효율적 (추천)
+    # deepseek-v4-pro: 고품질 추론, 복잡한 작업용
+    deepseek_model: str = field(
+        default_factory=lambda: os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
+    )
+
+    # ---- OpenAI API 설정 ----
+
+    # OpenAI API 인증 키 (https://platform.openai.com 에서 발급)
+    openai_api_key: str = field(
+        default_factory=lambda: os.getenv("OPENAI_API_KEY", "")
+    )
+
+    # OpenAI 기본 모델
+    # gpt-4.1: 최신 고품질 모델 (추천)
+    # gpt-4.1-mini: 빠른 응답, 비용 효율적
+    openai_model: str = field(
+        default_factory=lambda: os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+    )
+
+    # ---- 로그 설정 ----
+
+    # 로그 로테이션 방식: "size" (파일 크기 기준) 또는 "time" (시간 기준)
+    log_rotation: str = field(
+        default_factory=lambda: os.getenv("LOG_ROTATION", "size")
+    )
+
+    # size 모드: 로그 파일 최대 크기 (MB)
+    log_max_mb: int = field(
+        default_factory=lambda: int(os.getenv("LOG_MAX_MB", "10"))
+    )
+
+    # 보관할 백업 파일 개수
+    log_backup_count: int = field(
+        default_factory=lambda: int(os.getenv("LOG_BACKUP_COUNT", "5"))
+    )
+
+    # time 모드: 로테이션 주기
+    # "S"=초, "M"=분, "H"=시간, "D"=일, "midnight"=자정, "W0"~"W6"=요일
+    log_rotation_when: str = field(
+        default_factory=lambda: os.getenv("LOG_ROTATION_WHEN", "midnight")
+    )
+
+    # time 모드: 로테이션 간격 (when="H", interval=6 → 6시간마다)
+    log_rotation_interval: int = field(
+        default_factory=lambda: int(os.getenv("LOG_ROTATION_INTERVAL", "1"))
     )
 
 

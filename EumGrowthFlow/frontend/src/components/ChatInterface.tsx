@@ -1,5 +1,14 @@
+/**
+ * LLM 채팅 인터페이스
+ *
+ * 선택된 LLM 노드와 대화할 수 있는 우측 채팅 패널.
+ * 백엔드 /llm API 를 통해 대화를 처리하며, 이전 대화 이력을 프롬프트에 포함한다.
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { callLLM, hasBearerToken } from '../services/llmClient';
+import type { ChatMessage } from '../services/llmClient';
 import './ChatInterface.css';
 
 interface Message {
@@ -10,16 +19,17 @@ interface Message {
 
 interface ChatInterfaceProps {
   nodeConfig: {
-    apiUrl?: string;
-    apiMethod?: string;
-    apiKeyName?: string;
     model?: string;
   };
   maxHistory?: number;
   onClose: () => void;
 }
 
-const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfaceProps) => {
+const ChatInterface = ({
+  nodeConfig,
+  maxHistory = 5,
+  onClose,
+}: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -34,13 +44,8 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
     scrollToBottom();
   }, [messages]);
 
-  const getApiKey = (keyName?: string): string | null => {
-    if (!keyName) return null;
-    return localStorage.getItem(`apikey_${keyName}`);
-  };
-
   const sendMessage = async () => {
-    if (!input.trim() || !nodeConfig.apiUrl) return;
+    if (!input.trim()) return;
 
     const userMessage: Message = {
       role: 'user',
@@ -53,40 +58,20 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
     setIsLoading(true);
 
     try {
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-
-      const apiKey = getApiKey(nodeConfig.apiKeyName);
-      if (apiKey) {
-        headers['Authorization'] = `Bearer ${apiKey}`;
-      }
-
-      // 최근 N개의 메시지만 포함 (히스토리 제한)
       const recentMessages = messages.slice(-historyLimit);
+      const chatMessages: ChatMessage[] = [
+        ...recentMessages.map((msg) => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+        })),
+        { role: 'user' as const, content: userMessage.content },
+      ];
 
-      // Ollama 형식 요청
-      const requestBody = {
-        model: nodeConfig.model || 'llama2',
-        prompt: buildPromptWithHistory(recentMessages, userMessage.content),
-        stream: false,
-      };
-
-      const response = await fetch(nodeConfig.apiUrl, {
-        method: nodeConfig.apiMethod || 'POST',
-        headers,
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await callLLM(chatMessages, nodeConfig.model);
 
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.response || JSON.stringify(data),
+        content: data.response,
         timestamp: new Date(),
       };
 
@@ -103,24 +88,6 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
     }
   };
 
-  const buildPromptWithHistory = (history: Message[], newMessage: string): string => {
-    let prompt = '';
-
-    // 이전 대화 이력 추가
-    history.forEach((msg) => {
-      if (msg.role === 'user') {
-        prompt += `User: ${msg.content}\n`;
-      } else {
-        prompt += `Assistant: ${msg.content}\n`;
-      }
-    });
-
-    // 현재 메시지 추가
-    prompt += `User: ${newMessage}\nAssistant:`;
-
-    return prompt;
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -132,16 +99,20 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
     setMessages([]);
   };
 
+  const canSend = !isLoading && input.trim().length > 0 && hasBearerToken();
+
   return (
     <div style={containerStyle}>
       {/* 헤더 */}
       <div style={headerStyle}>
         <div>
-          <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '4px' }}>
+          <h3 style={{
+            fontSize: '16px', fontWeight: 'bold', marginBottom: '4px',
+          }}>
             💬 채팅 인터페이스
           </h3>
           <div style={{ fontSize: '12px', color: '#6b7280' }}>
-            모델: {nodeConfig.model || 'llama2'} | 히스토리: {historyLimit}개
+            모델: {nodeConfig.model || '서버 기본값'} | 히스토리: {historyLimit}개
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -173,7 +144,9 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
           <div style={emptyStateStyle}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>💬</div>
             <div style={{ fontSize: '14px', color: '#6b7280' }}>
-              메시지를 입력하여 대화를 시작하세요
+              {hasBearerToken()
+                ? '메시지를 입력하여 대화를 시작하세요'
+                : '⚠️ API 토큰이 설정되지 않았습니다. 툴바의 🔑 버튼에서 토큰을 설정하세요.'}
             </div>
           </div>
         ) : (
@@ -186,10 +159,13 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
                 alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
                 backgroundColor: msg.role === 'user' ? '#3b82f6' : '#fff',
                 color: msg.role === 'user' ? '#fff' : '#1f2937',
-                border: msg.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
+                border:
+                  msg.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
               }}
             >
-              <div style={{ fontSize: '11px', marginBottom: '4px', opacity: 0.7 }}>
+              <div style={{
+                fontSize: '11px', marginBottom: '4px', opacity: 0.7,
+              }}>
                 {msg.role === 'user' ? '👤 You' : '🤖 AI'}
               </div>
               <div className="markdown-content" style={{ wordWrap: 'break-word' }}>
@@ -199,7 +175,9 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
                   <div style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</div>
                 )}
               </div>
-              <div style={{ fontSize: '10px', marginTop: '4px', opacity: 0.6 }}>
+              <div style={{
+                fontSize: '10px', marginTop: '4px', opacity: 0.6,
+              }}>
                 {msg.timestamp.toLocaleTimeString()}
               </div>
             </div>
@@ -214,14 +192,18 @@ const ChatInterface = ({ nodeConfig, maxHistory = 5, onClose }: ChatInterfacePro
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="메시지를 입력하세요... (Enter: 전송, Shift+Enter: 줄바꿈)"
-          disabled={isLoading || !nodeConfig.apiUrl}
+          placeholder={
+            hasBearerToken()
+              ? '메시지를 입력하세요... (Enter: 전송, Shift+Enter: 줄바꿈)'
+              : 'API 토큰을 먼저 설정해주세요.'
+          }
+          disabled={!hasBearerToken()}
           style={inputStyle}
           rows={3}
         />
         <button
           onClick={sendMessage}
-          disabled={isLoading || !input.trim() || !nodeConfig.apiUrl}
+          disabled={!canSend}
           style={sendButtonStyle}
         >
           {isLoading ? '⏳ 전송 중...' : '📤 전송'}

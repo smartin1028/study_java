@@ -5,21 +5,36 @@ API 엔드포인트의 입출력 스키마를 정의한다.
 FastAPI 는 이 모델을 기반으로 자동 요청 검증, 직렬화/역직렬화, OpenAPI 문서를 생성한다.
 """
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
+
+
+class Message(BaseModel):
+    """대화 메시지 스키마"""
+
+    role: Literal["user", "assistant", "system"] = Field(
+        ...,
+        description="메시지 발신자 (user, assistant, system)",
+    )
+    content: str = Field(
+        ...,
+        min_length=1,
+        description="메시지 내용",
+    )
 
 
 class LLMRequest(BaseModel):
     """
     POST /llm 엔드포인트의 요청 바디 스키마
 
-    클라이언트는 프롬프트 문자열과 선택적으로 모델명을 전달한다.
-    Pydantic 이 자동으로 유효성 검사를 수행한다 (예: prompt 가 비어있지 않은지).
+    클라이언트는 대화 메시지 배열과 선택적으로 모델명을 전달한다.
     """
 
-    prompt: str = Field(
+    messages: list[Message] = Field(
         ...,
         min_length=1,
-        description="LLM 에 전송할 프롬프트 문자열 (1글자 이상 필수)",
+        description="LLM 에 전송할 대화 메시지 배열",
     )
     model: str | None = Field(
         None,

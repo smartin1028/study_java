@@ -62,16 +62,16 @@ class OllamaProvider(AbstractLLMProvider):
         return self._client
 
     async def generate(
-        self, prompt: str, model: str | None = None, **kwargs
+        self, messages: list[dict], model: str | None = None, **kwargs
     ) -> LLMResponse:
         """
-        Ollama 서버에 프롬프트를 전송하고 생성된 텍스트를 반환한다.
+        Ollama 서버에 대화 메시지를 전송하고 생성된 텍스트를 반환한다.
 
-        Ollama /api/generate API 를 호출하며, stream: false 로 설정하여
-        단일 JSON 응답을 받는다. model 파라미터가 None 이면 기본 모델을 사용한다.
+        messages 배열을 Ollama /api/generate API 에 적합한 텍스트 형식으로 변환한다.
+        model 파라미터가 None 이면 기본 모델을 사용한다.
 
         Args:
-            prompt: LLM 에 전송할 입력 텍스트
+            messages: [{"role": "user"|"assistant"|"system", "content": "..."}] 형식의 대화 이력
             model: 사용할 Ollama 모델명 (None 이면 기본값 deepseek-r1:1.5b)
             **kwargs: Ollama API 로 전달할 추가 파라미터 (예: temperature, top_p)
 
@@ -82,14 +82,26 @@ class OllamaProvider(AbstractLLMProvider):
             httpx.HTTPStatusError: Ollama 서버가 오류 응답을 반환한 경우
             httpx.ConnectError: Ollama 서버에 연결할 수 없는 경우
         """
-        # 모델명이 지정되지 않으면 기본 모델 사용
         model_name = model or self.default_model
 
-        # Ollama API 요청 페이로드 구성
+        # messages 배열을 Ollama 용 텍스트 프롬프트로 변환
+        prompt_parts: list[str] = []
+        for msg in messages:
+            role = msg["role"]
+            content = msg["content"]
+            if role == "system":
+                prompt_parts.append(f"System: {content}")
+            elif role == "user":
+                prompt_parts.append(f"User: {content}")
+            elif role == "assistant":
+                prompt_parts.append(f"Assistant: {content}")
+        prompt = "\n".join(prompt_parts)
+        prompt += "\nAssistant:"
+
         payload = {
             "model": model_name,
             "prompt": prompt,
-            "stream": False,  # 스트리밍 비활성화: 단일 JSON 응답
+            "stream": False,
         }
         # temperature 등 추가 파라미터가 있으면 병합
         payload.update(kwargs)

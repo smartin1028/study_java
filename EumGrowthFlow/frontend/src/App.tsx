@@ -1,3 +1,11 @@
+/**
+ * EumGrowthFlow 메인 애플리케이션 컴포넌트
+ *
+ * ReactFlow 기반의 AI 에이전트 워크플로우 빌더.
+ * 노드 설정, 워크플로우 실행, 암호화 저장/불러오기, LLM 채팅 기능을 제공한다.
+ * 모든 LLM API 호출은 백엔드 서버를 통해 처리된다.
+ */
+
 import { useCallback, useState } from 'react';
 import ReactFlow, {
   MiniMap,
@@ -16,14 +24,25 @@ import NodeConfigPanel from './components/NodeConfigPanel';
 import ExecutionPanel from './components/ExecutionPanel';
 import ChatInterface from './components/ChatInterface';
 import PasswordModal from './components/PasswordModal';
+import BackendTokenModal from './components/BackendTokenModal';
 import { workflowExecutor } from './services/workflowExecutor';
-import { downloadEncryptedWorkflow, loadEncryptedWorkflow } from './utils/encryption';
+import {
+  downloadEncryptedWorkflow,
+  loadEncryptedWorkflow,
+} from './utils/encryption';
+import {
+  setBearerToken,
+  hasBearerToken,
+  clearBearerToken,
+} from './services/llmClient';
 import './App.css';
 
+// ReactFlow 커스텀 노드 타입 등록
 const nodeTypes = {
   aiAgent: AIAgentNode,
 };
 
+// 초기 캔버스 상태: 시작 노드 하나
 const initialNodes = [
   {
     id: '1',
@@ -32,7 +51,7 @@ const initialNodes = [
     data: {
       label: 'Start Node',
       agentType: 'input',
-      description: '워크플로우 시작점'
+      description: '워크플로우 시작점',
     },
   },
 ];
@@ -51,10 +70,11 @@ function App() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordMode, setPasswordMode] = useState<'save' | 'load'>('save');
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [showTokenModal, setShowTokenModal] = useState(false);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    [setEdges],
   );
 
   const onNodeClick = useCallback((_event: any, node: any) => {
@@ -65,27 +85,27 @@ function App() {
     setSelectedNode(null);
   }, []);
 
-  const handleSaveNodeConfig = useCallback((config: any) => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === config.id) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              label: config.label,
-              prompt: config.prompt,
-              apiUrl: config.apiUrl,
-              apiMethod: config.apiMethod,
-              apiKeyName: config.apiKeyName,
-              model: config.model,
-            },
-          };
-        }
-        return node;
-      })
-    );
-  }, [setNodes]);
+  const handleSaveNodeConfig = useCallback(
+    (config: any) => {
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === config.id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                label: config.label,
+                prompt: config.prompt,
+                model: config.model,
+              },
+            };
+          }
+          return node;
+        }),
+      );
+    },
+    [setNodes],
+  );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -115,14 +135,11 @@ function App() {
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [setNodes]
+    [setNodes],
   );
 
   const onSave = useCallback(() => {
-    const flow = {
-      nodes,
-      edges,
-    };
+    const flow = { nodes, edges };
     localStorage.setItem('workflow', JSON.stringify(flow));
     alert('워크플로우가 저장되었습니다!');
   }, [nodes, edges]);
@@ -168,9 +185,6 @@ function App() {
   const handleOpenChat = useCallback(() => {
     if (selectedNode) {
       setChatConfig({
-        apiUrl: selectedNode.data.apiUrl,
-        apiMethod: selectedNode.data.apiMethod,
-        apiKeyName: selectedNode.data.apiKeyName,
         model: selectedNode.data.model,
       });
       setShowChat(true);
@@ -184,30 +198,33 @@ function App() {
     setShowPasswordModal(true);
   }, []);
 
-  const handlePasswordConfirm = useCallback((password: string) => {
-    if (passwordMode === 'save') {
-      try {
-        downloadEncryptedWorkflow(nodes, edges, password);
-        alert('🔒 암호화된 워크플로우가 다운로드되었습니다!');
-      } catch (error: any) {
-        alert(`❌ 저장 실패: ${error.message}`);
+  const handlePasswordConfirm = useCallback(
+    (password: string) => {
+      if (passwordMode === 'save') {
+        try {
+          downloadEncryptedWorkflow(nodes, edges, password);
+          alert('🔒 암호화된 워크플로우가 다운로드되었습니다!');
+        } catch (error: any) {
+          alert(`❌ 저장 실패: ${error.message}`);
+        }
+      } else if (passwordMode === 'load' && pendingFile) {
+        loadEncryptedWorkflow(pendingFile, password)
+          .then(({ nodes: loadedNodes, edges: loadedEdges }) => {
+            setNodes(loadedNodes);
+            setEdges(loadedEdges);
+            alert('✅ 암호화된 워크플로우가 로드되었습니다!');
+          })
+          .catch((error: any) => {
+            alert(`❌ 불러오기 실패: ${error.message}`);
+          })
+          .finally(() => {
+            setPendingFile(null);
+          });
       }
-    } else if (passwordMode === 'load' && pendingFile) {
-      loadEncryptedWorkflow(pendingFile, password)
-        .then(({ nodes: loadedNodes, edges: loadedEdges }) => {
-          setNodes(loadedNodes);
-          setEdges(loadedEdges);
-          alert('✅ 암호화된 워크플로우가 로드되었습니다!');
-        })
-        .catch((error: any) => {
-          alert(`❌ 불러오기 실패: ${error.message}`);
-        })
-        .finally(() => {
-          setPendingFile(null);
-        });
-    }
-    setShowPasswordModal(false);
-  }, [passwordMode, nodes, edges, pendingFile, setNodes, setEdges]);
+      setShowPasswordModal(false);
+    },
+    [passwordMode, nodes, edges, pendingFile, setNodes, setEdges],
+  );
 
   // 암호화 파일 불러오기
   const handleEncryptedLoad = useCallback(() => {
@@ -225,55 +242,79 @@ function App() {
     input.click();
   }, []);
 
+  // 백엔드 API 토큰 관리 핸들러
+  const handleTokenConfirm = useCallback((token: string) => {
+    setBearerToken(token);
+    setShowTokenModal(false);
+  }, []);
+
+  const handleTokenClear = useCallback(() => {
+    clearBearerToken();
+    setShowTokenModal(false);
+  }, []);
+
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'flex' }}>
+    <div style={{ width: '100%', height: '100vh', display: 'flex' }}>
       <Sidebar />
-      <div style={{ flexGrow: 1, position: 'relative' }}>
-        <div style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          zIndex: 4,
-          display: 'flex',
-          gap: '10px'
-        }}>
+      <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        {/* 툴바 버튼 */}
+        <div style={toolbarStyle}>
           <button onClick={onExecute} style={executeButtonStyle} disabled={isRunning}>
             {isRunning ? '⏳ 실행 중...' : '▶️ 실행'}
           </button>
           <button onClick={onSave} style={buttonStyle}>저장</button>
           <button onClick={onLoad} style={buttonStyle}>불러오기</button>
-          <button onClick={handleEncryptedSave} style={encryptedButtonStyle}>🔒 암호화 저장</button>
-          <button onClick={handleEncryptedLoad} style={encryptedButtonStyle}>🔓 암호화 불러오기</button>
+          <button onClick={handleEncryptedSave} style={encryptedButtonStyle}>
+            🔒 암호화 저장
+          </button>
+          <button onClick={handleEncryptedLoad} style={encryptedButtonStyle}>
+            🔓 암호화 불러오기
+          </button>
           <button onClick={onClear} style={buttonStyle}>초기화</button>
+          <button
+            onClick={() => setShowTokenModal(true)}
+            style={hasBearerToken() ? tokenActiveButtonStyle : tokenButtonStyle}
+          >
+            {hasBearerToken() ? '🔑 설정됨' : '🔑 API 토큰'}
+          </button>
         </div>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onNodeClick={onNodeClick}
-          onPaneClick={onPaneClick}
-          nodeTypes={nodeTypes}
-          fitView
-        >
-          <Controls />
-          <MiniMap />
-          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-        </ReactFlow>
+
+        <div style={{ flexGrow: 1, position: 'relative', minHeight: 0 }}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
+            nodeTypes={nodeTypes}
+            fitView
+          >
+            <Controls />
+            <MiniMap />
+            <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+          </ReactFlow>
+        </div>
       </div>
 
+      {/* 노드 설정 패널 */}
       {selectedNode && !showChat && (
         <NodeConfigPanel
           selectedNode={{ id: selectedNode.id, ...selectedNode.data }}
           onClose={() => setSelectedNode(null)}
           onSave={handleSaveNodeConfig}
-          onOpenChat={selectedNode.data.agentType === 'llm' ? handleOpenChat : undefined}
+          onOpenChat={
+            selectedNode.data.agentType === 'llm'
+              ? handleOpenChat
+              : undefined
+          }
         />
       )}
 
+      {/* LLM 채팅 인터페이스 */}
       {showChat && chatConfig && (
         <ChatInterface
           nodeConfig={chatConfig}
@@ -281,6 +322,7 @@ function App() {
         />
       )}
 
+      {/* 실행 결과 패널 */}
       {showResults && (
         <ExecutionPanel
           results={executionResults}
@@ -289,17 +331,36 @@ function App() {
         />
       )}
 
+      {/* 암호화 비밀번호 모달 */}
       <PasswordModal
         isOpen={showPasswordModal}
         mode={passwordMode}
         onConfirm={handlePasswordConfirm}
         onCancel={() => setShowPasswordModal(false)}
       />
+
+      {/* 백엔드 API 토큰 설정 모달 */}
+      <BackendTokenModal
+        isOpen={showTokenModal}
+        onConfirm={handleTokenConfirm}
+        onCancel={() => setShowTokenModal(false)}
+        onClear={handleTokenClear}
+        hasExistingToken={hasBearerToken()}
+      />
     </div>
   );
 }
 
-const executeButtonStyle = {
+const toolbarStyle: React.CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  justifyContent: 'flex-end',
+  gap: '10px',
+  padding: '10px',
+  zIndex: 4,
+};
+
+const executeButtonStyle: React.CSSProperties = {
   padding: '8px 16px',
   backgroundColor: '#10b981',
   color: 'white',
@@ -310,7 +371,7 @@ const executeButtonStyle = {
   fontWeight: '600',
 };
 
-const buttonStyle = {
+const buttonStyle: React.CSSProperties = {
   padding: '8px 16px',
   backgroundColor: '#1a192b',
   color: 'white',
@@ -320,7 +381,7 @@ const buttonStyle = {
   fontSize: '14px',
 };
 
-const encryptedButtonStyle = {
+const encryptedButtonStyle: React.CSSProperties = {
   padding: '8px 16px',
   backgroundColor: '#6366f1',
   color: 'white',
@@ -329,6 +390,22 @@ const encryptedButtonStyle = {
   cursor: 'pointer',
   fontSize: '14px',
   fontWeight: '600',
+};
+
+const tokenButtonStyle: React.CSSProperties = {
+  padding: '8px 16px',
+  backgroundColor: '#f59e0b',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  fontSize: '14px',
+  fontWeight: '600',
+};
+
+const tokenActiveButtonStyle: React.CSSProperties = {
+  ...tokenButtonStyle,
+  backgroundColor: '#059669',
 };
 
 export default App;

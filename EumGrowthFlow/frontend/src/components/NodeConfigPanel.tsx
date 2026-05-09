@@ -1,13 +1,19 @@
+/**
+ * 노드 설정 패널
+ *
+ * 선택된 워크플로우 노드의 설정을 편집하는 우측 슬라이드 패널.
+ * LLM 노드의 경우 프롬프트, 모델명을 설정하고 백엔드 API 테스트를 수행할 수 있다.
+ * API URL, API Key 등은 백엔드에서 관리하므로 더 이상 노드별로 설정하지 않는다.
+ */
+
 import { useState, useEffect } from 'react';
+import { callLLM } from '../services/llmClient';
 
 interface NodeConfig {
   id: string;
   label: string;
   agentType: string;
   prompt?: string;
-  apiUrl?: string;
-  apiMethod?: string;
-  apiKeyName?: string;
   model?: string;
 }
 
@@ -18,34 +24,34 @@ interface NodeConfigPanelProps {
   onOpenChat?: () => void;
 }
 
-const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConfigPanelProps) => {
+const NodeConfigPanel = ({
+  selectedNode,
+  onClose,
+  onSave,
+  onOpenChat,
+}: NodeConfigPanelProps) => {
   const [config, setConfig] = useState<NodeConfig | null>(selectedNode);
-  const [apiKey, setApiKey] = useState('');
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
 
   useEffect(() => {
     setConfig(selectedNode);
     setTestResult(null);
-    if (selectedNode?.apiKeyName) {
-      const storedKey = localStorage.getItem(`apikey_${selectedNode.apiKeyName}`);
-      setApiKey(storedKey || '');
-    }
   }, [selectedNode]);
 
   if (!config) return null;
 
   const handleSave = () => {
-    if (config.apiKeyName && apiKey) {
-      localStorage.setItem(`apikey_${config.apiKeyName}`, apiKey);
-    }
     onSave(config);
     onClose();
   };
 
   const handleTest = async () => {
-    if (!config.apiUrl || !config.prompt) {
-      setTestResult({ success: false, error: 'API URL과 프롬프트를 입력하세요.' });
+    if (!config.prompt) {
+      setTestResult({
+        success: false,
+        error: '프롬프트를 입력하세요.',
+      });
       return;
     }
 
@@ -53,36 +59,7 @@ const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConf
     setTestResult(null);
 
     try {
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-
-      if (config.apiKeyName && apiKey) {
-        headers['Authorization'] = `Bearer ${apiKey}`;
-      }
-
-      const method = config.apiMethod || 'POST';
-
-      // Ollama 형식 요청 바디
-      const requestBody = {
-        // model: config.model || 'llama2',
-        model: config.model || 'qwen3:8b',
-        prompt: config.prompt,
-        stream: false,
-      };
-
-      const response = await fetch(config.apiUrl, {
-        method,
-        headers,
-        body: method !== 'GET' ? JSON.stringify(requestBody) : undefined,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API 호출 실패 (${response.status}): ${errorText}`);
-      }
-
-      const data = await response.json();
+      const data = await callLLM([{ role: 'user', content: config.prompt }], config.model || undefined);
       setTestResult({ success: true, data });
     } catch (error: any) {
       setTestResult({ success: false, error: error.message });
@@ -91,35 +68,14 @@ const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConf
     }
   };
 
-  const handleSetOllamaDefaults = () => {
-    setConfig({
-      ...config,
-      apiUrl: 'http://localhost:11434/api/generate',
-      apiMethod: 'POST',
-      prompt: config.prompt || 'Hello, how are you?',
-      model: config.model || 'qwen3:8b',
-    });
-  };
-
   const isLLMNode = config.agentType === 'llm';
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        right: 0,
-        top: 0,
-        width: '350px',
-        height: '100vh',
-        backgroundColor: '#fff',
-        boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
-        padding: '20px',
-        overflowY: 'auto',
-        zIndex: 10,
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1a192b' }}>노드 설정</h2>
+    <div style={panelStyle}>
+      <div style={headerStyle}>
+        <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1a192b' }}>
+          노드 설정
+        </h2>
         <button onClick={onClose} style={closeButtonStyle}>✕</button>
       </div>
 
@@ -139,22 +95,24 @@ const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConf
           type="text"
           value={config.agentType}
           disabled
-          style={{ ...inputStyle, backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
+          style={{
+            ...inputStyle,
+            backgroundColor: '#f3f4f6',
+            cursor: 'not-allowed',
+          }}
         />
       </div>
 
       {isLLMNode && (
         <>
-          <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#eff6ff', borderRadius: '6px' }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e40af', marginBottom: '8px' }}>
-              🦙 Ollama 빠른 설정
+          <div style={backendInfoBoxStyle}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e40af', marginBottom: '4px' }}>
+              🔗 백엔드 프록시 모드
             </div>
-            <button onClick={handleSetOllamaDefaults} style={quickSetupButtonStyle}>
-              Ollama 기본값 설정
-            </button>
-            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
-              로컬 Ollama 서버 (localhost:11434) 기본 설정
-            </p>
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+              API 호출은 백엔드 서버를 통해 처리됩니다.
+              Provider 선택(Ollama/DeepSeek/OpenAI)은 서버 설정에서 관리됩니다.
+            </div>
           </div>
 
           <div style={{ marginBottom: '16px' }}>
@@ -162,7 +120,7 @@ const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConf
             <textarea
               value={config.prompt || ''}
               onChange={(e) => setConfig({ ...config, prompt: e.target.value })}
-              placeholder="LLM에 전달할 프롬프트를 입력하세요..."
+              placeholder="LLM 에 전달할 프롬프트를 입력하세요..."
               rows={6}
               style={textareaStyle}
             />
@@ -174,68 +132,16 @@ const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConf
               type="text"
               value={config.model || ''}
               onChange={(e) => setConfig({ ...config, model: e.target.value })}
-              placeholder="llama2, mistral, codellama..."
+              placeholder="미지정 시 서버 기본 모델 사용"
               style={inputStyle}
             />
             <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-              💡 Ollama 모델: llama2, mistral, codellama, phi 등
+              💡 Ollama: deepseek-r1:1.5b / DeepSeek: deepseek-v4-flash / OpenAI: gpt-4.1-mini
             </p>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>API URL</label>
-            <input
-              type="text"
-              value={config.apiUrl || ''}
-              onChange={(e) => setConfig({ ...config, apiUrl: e.target.value })}
-              placeholder="http://localhost:11434/api/generate"
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>HTTP Method</label>
-            <select
-              value={config.apiMethod || 'POST'}
-              onChange={(e) => setConfig({ ...config, apiMethod: e.target.value })}
-              style={inputStyle}
-            >
-              <option value="GET">GET</option>
-              <option value="POST">POST</option>
-              <option value="PUT">PUT</option>
-              <option value="PATCH">PATCH</option>
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>API Key 이름</label>
-            <input
-              type="text"
-              value={config.apiKeyName || ''}
-              onChange={(e) => setConfig({ ...config, apiKeyName: e.target.value })}
-              placeholder="예: openai_key"
-              style={inputStyle}
-            />
-          </div>
-
-          {config.apiKeyName && (
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>API Key (암호화 저장)</label>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="API Key를 입력하세요"
-                style={inputStyle}
-              />
-              <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                🔒 브라우저 로컬 스토리지에 저장됩니다
-              </p>
-            </div>
-          )}
-
           {/* 테스트 및 채팅 버튼 */}
-          <div style={{ marginTop: '16px', marginBottom: '16px', display: 'flex', gap: '8px' }}>
+          <div style={buttonRowStyle}>
             <button
               onClick={handleTest}
               disabled={isTesting}
@@ -255,75 +161,27 @@ const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConf
 
           {/* 테스트 결과 */}
           {testResult && (
-            <div
-              style={{
-                marginTop: '16px',
-                padding: '12px',
-                backgroundColor: testResult.success ? '#f0fdf4' : '#fef2f2',
-                border: `1px solid ${testResult.success ? '#86efac' : '#fca5a5'}`,
-                borderRadius: '6px',
-              }}
-            >
-              <div style={{
-                fontSize: '14px',
-                fontWeight: '600',
-                color: testResult.success ? '#15803d' : '#dc2626',
-                marginBottom: '8px'
-              }}>
+            <div style={testResultContainerStyle(testResult.success)}>
+              <div style={testResultHeaderStyle(testResult.success)}>
                 {testResult.success ? '✅ 테스트 성공' : '❌ 테스트 실패'}
               </div>
               {testResult.success ? (
                 <>
-                  {/* Response 필드만 강조 표시 */}
                   {testResult.data.response && (
-                    <div style={{
-                      marginBottom: '12px',
-                      padding: '12px',
-                      backgroundColor: '#fff',
-                      border: '2px solid #10b981',
-                      borderRadius: '6px',
-                    }}>
-                      <div style={{
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        color: '#059669',
-                        marginBottom: '8px',
-                      }}>
-                        💬 응답 (Response)
+                    <div style={responseBoxStyle}>
+                      <div style={responseLabelStyle}>
+                        💬 응답 (Response) — 모델: {testResult.data.model}
                       </div>
-                      <div style={{
-                        fontSize: '13px',
-                        color: '#1f2937',
-                        lineHeight: '1.6',
-                        whiteSpace: 'pre-wrap',
-                        wordWrap: 'break-word',
-                      }}>
+                      <div style={responseContentStyle}>
                         {testResult.data.response}
                       </div>
                     </div>
                   )}
-
-                  {/* 전체 응답 (접을 수 있게) */}
                   <details style={{ marginTop: '8px' }}>
-                    <summary style={{
-                      fontSize: '12px',
-                      color: '#6b7280',
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                    }}>
+                    <summary style={detailSummaryStyle}>
                       📋 전체 응답 보기
                     </summary>
-                    <pre style={{
-                      fontSize: '11px',
-                      backgroundColor: '#f9fafb',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      overflow: 'auto',
-                      maxHeight: '200px',
-                      marginTop: '8px',
-                      whiteSpace: 'pre-wrap',
-                      wordWrap: 'break-word',
-                    }}>
+                    <pre style={detailPreStyle}>
                       {JSON.stringify(testResult.data, null, 2)}
                     </pre>
                   </details>
@@ -346,7 +204,27 @@ const NodeConfigPanel = ({ selectedNode, onClose, onSave, onOpenChat }: NodeConf
   );
 };
 
-const labelStyle = {
+const panelStyle: React.CSSProperties = {
+  position: 'fixed',
+  right: 0,
+  top: 0,
+  width: '350px',
+  height: '100vh',
+  backgroundColor: '#fff',
+  boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
+  padding: '20px',
+  overflowY: 'auto',
+  zIndex: 10,
+};
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '20px',
+};
+
+const labelStyle: React.CSSProperties = {
   display: 'block',
   fontSize: '14px',
   fontWeight: '600',
@@ -354,23 +232,94 @@ const labelStyle = {
   marginBottom: '6px',
 };
 
-const inputStyle = {
+const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '8px 12px',
   fontSize: '14px',
   border: '1px solid #d1d5db',
   borderRadius: '6px',
   outline: 'none',
-  transition: 'border-color 0.2s',
 };
 
-const textareaStyle = {
+const textareaStyle: React.CSSProperties = {
   ...inputStyle,
   resize: 'vertical' as const,
   fontFamily: 'monospace',
 };
 
-const saveButtonStyle = {
+const backendInfoBoxStyle: React.CSSProperties = {
+  marginBottom: '16px',
+  padding: '12px',
+  backgroundColor: '#eff6ff',
+  borderRadius: '6px',
+  border: '1px solid #dbeafe',
+};
+
+const buttonRowStyle: React.CSSProperties = {
+  marginTop: '16px',
+  marginBottom: '16px',
+  display: 'flex',
+  gap: '8px',
+};
+
+const testResultContainerStyle = (success: boolean): React.CSSProperties => ({
+  marginTop: '16px',
+  padding: '12px',
+  backgroundColor: success ? '#f0fdf4' : '#fef2f2',
+  border: `1px solid ${success ? '#86efac' : '#fca5a5'}`,
+  borderRadius: '6px',
+});
+
+const testResultHeaderStyle = (success: boolean): React.CSSProperties => ({
+  fontSize: '14px',
+  fontWeight: '600',
+  color: success ? '#15803d' : '#dc2626',
+  marginBottom: '8px',
+});
+
+const responseBoxStyle: React.CSSProperties = {
+  marginBottom: '12px',
+  padding: '12px',
+  backgroundColor: '#fff',
+  border: '2px solid #10b981',
+  borderRadius: '6px',
+};
+
+const responseLabelStyle: React.CSSProperties = {
+  fontSize: '13px',
+  fontWeight: '600',
+  color: '#059669',
+  marginBottom: '8px',
+};
+
+const responseContentStyle: React.CSSProperties = {
+  fontSize: '13px',
+  color: '#1f2937',
+  lineHeight: '1.6',
+  whiteSpace: 'pre-wrap',
+  wordWrap: 'break-word',
+};
+
+const detailSummaryStyle: React.CSSProperties = {
+  fontSize: '12px',
+  color: '#6b7280',
+  cursor: 'pointer',
+  userSelect: 'none',
+};
+
+const detailPreStyle: React.CSSProperties = {
+  fontSize: '11px',
+  backgroundColor: '#f9fafb',
+  padding: '8px',
+  borderRadius: '4px',
+  overflow: 'auto',
+  maxHeight: '200px',
+  marginTop: '8px',
+  whiteSpace: 'pre-wrap',
+  wordWrap: 'break-word',
+};
+
+const saveButtonStyle: React.CSSProperties = {
   flex: 1,
   padding: '10px 16px',
   backgroundColor: '#3b82f6',
@@ -382,7 +331,7 @@ const saveButtonStyle = {
   fontWeight: '600',
 };
 
-const cancelButtonStyle = {
+const cancelButtonStyle: React.CSSProperties = {
   flex: 1,
   padding: '10px 16px',
   backgroundColor: '#6b7280',
@@ -394,7 +343,7 @@ const cancelButtonStyle = {
   fontWeight: '600',
 };
 
-const closeButtonStyle = {
+const closeButtonStyle: React.CSSProperties = {
   padding: '4px 8px',
   backgroundColor: 'transparent',
   border: 'none',
@@ -403,7 +352,7 @@ const closeButtonStyle = {
   color: '#6b7280',
 };
 
-const testButtonStyle = {
+const testButtonStyle: React.CSSProperties = {
   width: '100%',
   padding: '10px 16px',
   backgroundColor: '#f59e0b',
@@ -415,7 +364,7 @@ const testButtonStyle = {
   fontWeight: '600',
 };
 
-const chatButtonStyle = {
+const chatButtonStyle: React.CSSProperties = {
   width: '100%',
   padding: '10px 16px',
   backgroundColor: '#10b981',
@@ -424,18 +373,6 @@ const chatButtonStyle = {
   borderRadius: '6px',
   cursor: 'pointer',
   fontSize: '14px',
-  fontWeight: '600',
-};
-
-const quickSetupButtonStyle = {
-  width: '100%',
-  padding: '8px 12px',
-  backgroundColor: '#3b82f6',
-  color: 'white',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  fontSize: '13px',
   fontWeight: '600',
 };
 

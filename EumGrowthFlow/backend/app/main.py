@@ -13,12 +13,129 @@ POST /llm 엔드포인트를 통해 Bearer 토큰 인증 후 LLM 추론을 수�
   - Lifespan: 앱 시작/종료 시 리소스 관리
 """
 
+import json
+import logging
+import time
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, HTTPException, status
+import gzip
+import os
+import shutil
+from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
+from pathlib import Path
+from fastapi import FastAPI, Depends, HTTPException, Request, status
 from fastapi.security import APIKeyHeader
 from config import settings
 from models import LLMRequest, LLMResponse
 from providers import get_provider, AbstractLLMProvider
+
+LOG_DIR = Path(__file__).parent / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+
+class CompressedRotatingFileHandler(RotatingFileHandler):
+    """크기 기반 로그 로테이션 + .gz 압축"""
+
+    def doRollover(self):
+        if self.stream:
+            self.stream.close()
+            self.stream = None
+
+        for i in range(self.backupCount - 1, 0, -1):
+            sfn = f"{self.baseFilename}.{i}.gz"
+            dfn = f"{self.baseFilename}.{i + 1}.gz"
+            if os.path.exists(sfn):
+                if os.path.exists(dfn):
+                    os.remove(dfn)
+                os.rename(sfn, dfn)
+
+        oldest = f"{self.baseFilename}.{self.backupCount + 1}.gz"
+        if os.path.exists(oldest):
+            os.remove(oldest)
+
+        if os.path.exists(self.baseFilename):
+            dfn = f"{self.baseFilename}.1.gz"
+            with open(self.baseFilename, "rb") as f_in:
+                with gzip.open(dfn, "wb") as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+
+        if not self.delay:
+            self.stream = self._open()
+
+
+class CompressedTimedRotatingFileHandler(TimedRotatingFileHandler):
+    """시간 기반 로그 로테이션 + .gz 압축"""
+
+    def doRollover(self):
+        if self.stream:
+            self.stream.close()
+            self.stream = None
+
+        # 현재 로그 파일의 suffix 생성 (TimedRotatingFileHandler 와 동일)
+        current_time = int(time.time())
+        dst_now = current_time - (current_time % self.interval)
+        time_tuple = time.localtime(dst_now)
+        dfn = f"{self.baseFilename}.{time.strftime(self.suffix, time_tuple)}.gz"
+
+        if os.path.exists(self.baseFilename):
+            with open(self.baseFilename, "rb") as f_in:
+                with gzip.open(dfn, "wb") as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+
+        # 오래된 백업 정리
+        if self.backupCount > 0:
+            for s in self.getFilesToDelete():
+                os.remove(s)
+
+        if not self.delay:
+            self.stream = self._open()
+
+    def getFilesToDelete(self):
+        dir_name, base_name = os.path.split(self.baseFilename)
+        file_names = os.listdir(dir_name or ".")
+        prefix = base_name + "."
+        result = []
+        for fn in file_names:
+            if fn.startswith(prefix) and fn.endswith(".gz"):
+                result.append(os.path.join(dir_name, fn))
+        result.sort()
+        if len(result) >= self.backupCount:
+            result = result[:len(result) - self.backupCount + 1]
+        else:
+            result = []
+        return result
+
+
+def _build_file_handler() -> logging.Handler:
+    """설정에 따라 크기 또는 시간 기반 파일 핸들러를 생성"""
+    log_path = str(LOG_DIR / "app.log")
+    backup = settings.log_backup_count
+
+    if settings.log_rotation == "time":
+        return CompressedTimedRotatingFileHandler(
+            log_path,
+            when=settings.log_rotation_when,
+            interval=settings.log_rotation_interval,
+            backupCount=backup,
+            encoding="utf-8",
+        )
+    else:
+        return CompressedRotatingFileHandler(
+            log_path,
+            maxBytes=settings.log_max_mb * 1024 * 1024,
+            backupCount=backup,
+            encoding="utf-8",
+        )
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+        _build_file_handler(),
+    ],
+)
+logger = logging.getLogger("eumgrowthflow")
 
 
 @asynccontextmanager
@@ -26,19 +143,57 @@ async def lifespan(app: FastAPI):
     """
     애플리케이션 생명주기 관리
 
-    Startup: (현재 별도 초기화 없음 - Provider 는 지연 초기화)
+    Startup: 현재 설정된 Provider 와 모델 정보를 로그로 출력
     Shutdown: Provider 의 HTTP 클라이언트 연결 정리
     """
-    # Startup: 필요한 경우 여기에 초기화 코드 추가
-    yield
-    # Shutdown: Provider 가 close() 메서드를 지원하면 호출하여 리소스 정리
     provider = get_provider()
+    model = getattr(provider, "default_model", "unknown")
+    logger.info(
+        "LLM Provider: %s, 기본 모델: %s",
+        settings.llm_provider,
+        model,
+    )
+    yield
     if hasattr(provider, "close"):
         await provider.close()
 
 
 # FastAPI 애플리케이션 인스턴스 생성 (생명주기 핸들러 포함)
 app = FastAPI(lifespan=lifespan)
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.perf_counter()
+
+    body = await request.body()
+    if body:
+        try:
+            data = json.loads(body)
+            messages = data.get("messages", [])
+            model = data.get("model") or settings.llm_provider
+            parts = []
+            for msg in messages:
+                role = msg.get("role", "?")
+                content = msg.get("content", "")
+                truncated = content[:80] + "..." if len(content) > 80 else content
+                parts.append(f"[{role}: {truncated}]")
+            history = " ".join(parts)
+            logger.info("→ %s %s model=%s %s", request.method, request.url.path, model, history)
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            logger.info("→ %s %s", request.method, request.url.path)
+    else:
+        logger.info("→ %s %s", request.method, request.url.path)
+
+    # 요청 바디를 다시 읽을 수 있도록 복원
+    async def receive():
+        return {"type": "http.request", "body": body, "more_body": False}
+    request._receive = receive
+
+    response = await call_next(request)
+    elapsed = time.perf_counter() - start
+    logger.info("← %s %d (%.2fs)", request.url.path, response.status_code, elapsed)
+    return response
 
 
 def validate_bearer_token(
@@ -101,9 +256,9 @@ async def call_llm(
       2. get_provider 로 현재 설정된 LLM Provider 인스턴스 주입
 
     데이터 흐름:
-      1. 클라이언트 → LLMRequest (prompt, model?)
-      2. Provider.generate(prompt, model) → Ollama API 호출
-      3. Ollama API 응답 → LLMResponse (response, model)
+      1. 클라이언트 → LLMRequest (messages, model?)
+      2. Provider.generate(messages, model) → LLM API 호출
+      3. LLM API 응답 → LLMResponse (response, model)
       4. LLMResponse → 클라이언트 JSON 응답
 
     Args:
@@ -120,8 +275,8 @@ async def call_llm(
         HTTPException 500: LLM 호출 중 발생한 모든 예외
     """
     try:
-        # Provider 를 통해 LLM 추론 실행 (비동기)
-        result = await provider.generate(request.prompt, request.model)
+        messages_dicts = [msg.model_dump() for msg in request.messages]
+        result = await provider.generate(messages_dicts, request.model)
         return result
     except Exception as e:
         # Provider 레벨의 모든 예외를 500 으로 변환

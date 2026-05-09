@@ -18,6 +18,9 @@ venv/
 # 테스트 캐시
 .pytest_cache/
 
+# 로그 파일
+logs/
+
 # uv 패키지 매니저
 # uv.lock
 

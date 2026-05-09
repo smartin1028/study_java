@@ -12,12 +12,19 @@ FastAPI 의 Depends() 메커니즘을 통해 엔드포인트에 의존성 주입
 
 from providers.base import AbstractLLMProvider
 from providers.ollama import OllamaProvider
+from providers.deepseek import DeepSeekProvider
+from providers.openai import OpenAIProvider
 from config import settings
 
 
 def get_provider() -> AbstractLLMProvider:
     """
     설정된 LLM_PROVIDER 값에 따라 적절한 Provider 인스턴스를 반환한다.
+
+    지원 Provider:
+      - "ollama": 로컬 Ollama 서버
+      - "deepseek": DeepSeek API (OpenAI 호환)
+      - "openai": OpenAI API
 
     Returns:
         AbstractLLMProvider: LLM 제공자 구현체 인스턴스
@@ -33,6 +40,10 @@ def get_provider() -> AbstractLLMProvider:
     match settings.llm_provider:
         case "ollama":
             return OllamaProvider()
+        case "deepseek":
+            return DeepSeekProvider()
+        case "openai":
+            return OpenAIProvider()
         case _:
             raise ValueError(
                 f"Unknown LLM_PROVIDER: {settings.llm_provider}"

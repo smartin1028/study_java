@@ -1,7 +1,7 @@
 def test_valid_bearer_token(client):
     response = client.post(
         "/llm",
-        json={"prompt": "Hello, world!"},
+        json={"messages": [{"role": "user", "content": "Hello, world!"}]},
         headers={"Authorization": "Bearer test_token"},
     )
     print(response.text)
@@ -14,7 +14,7 @@ def test_valid_bearer_token(client):
 def test_invalid_bearer_token(client):
     response = client.post(
         "/llm",
-        json={"prompt": "Hello, world!"},
+        json={"messages": [{"role": "user", "content": "Hello, world!"}]},
         headers={"Authorization": "Bearer wrong_token"},
     )
     assert response.status_code == 403
@@ -24,7 +24,7 @@ def test_invalid_bearer_token(client):
 def test_missing_bearer_token(client):
     response = client.post(
         "/llm",
-        json={"prompt": "Hello, world!"},
+        json={"messages": [{"role": "user", "content": "Hello, world!"}]},
     )
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid or missing bearer token"

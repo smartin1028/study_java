@@ -23,13 +23,13 @@ class AbstractLLMProvider(ABC):
 
     @abstractmethod
     async def generate(
-        self, prompt: str, model: str | None = None, **kwargs
+        self, messages: list[dict], model: str | None = None, **kwargs
     ) -> LLMResponse:
         """
-        LLM 에 프롬프트를 전송하고 생성된 응답을 반환한다.
+        LLM 에 대화 메시지를 전송하고 생성된 응답을 반환한다.
 
         Args:
-            prompt: LLM 에 전송할 입력 텍스트
+            messages: [{"role": "user"|"assistant"|"system", "content": "..."}] 형식의 대화 이력
             model: 사용할 모델명. None 이면 Provider 기본 모델 사용
             **kwargs: 제공자별 추가 파라미터 (예: temperature, max_tokens)
 
