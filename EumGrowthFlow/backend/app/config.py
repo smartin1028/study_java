@@ -1,0 +1,53 @@
+"""
+애플리케이션 설정 모듈
+
+.env 파일과 환경변수에서 설정값을 읽어와 Settings 객체로 제공한다.
+python-dotenv 를 통해 .env 파일을 자동으로 로드하며,
+환경변수가 설정되지 않은 경우 기본값을 사용한다.
+"""
+
+import os
+from dataclasses import dataclass, field
+from dotenv import load_dotenv
+
+# .env 파일을 환경변수로 로드 (이미 설정된 환경변수는 덮어쓰지 않음)
+load_dotenv()
+
+
+@dataclass(frozen=True)
+class Settings:
+    """
+    애플리케이션 전체 설정을 담는 불변 데이터 클래스
+
+    각 필드는 default_factory 를 통해 환경변수에서 값을 읽어오며,
+    환경변수가 없으면 지정된 기본값을 사용한다.
+    frozen=True 로 설정되어 생성 후 변경할 수 없다.
+    """
+
+    # LLM API 호출 시 인증에 사용할 Bearer 토큰
+    # .env 파일의 LLM_BEARER_TOKEN 또는 환경변수로 설정
+    bearer_token: str = field(
+        default_factory=lambda: os.getenv("LLM_BEARER_TOKEN", "")
+    )
+
+    # 사용할 LLM 제공자 식별자 ("ollama", 추후 "openai" 등)
+    # 이 값에 따라 providers/__init__.py 의 팩토리 함수가 적절한 구현체를 반환한다
+    llm_provider: str = field(
+        default_factory=lambda: os.getenv("LLM_PROVIDER", "ollama")
+    )
+
+    # Ollama 서버의 기본 URL (로컬 실행 기준 http://localhost:11434)
+    ollama_base_url: str = field(
+        default_factory=lambda: os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    )
+
+    # Ollama 에서 사용할 기본 모델명
+    # deepseek-r1:1.5b 는 경량 추론 모델로 로컬 실행에 적합
+    ollama_model: str = field(
+        default_factory=lambda: os.getenv("OLLAMA_MODEL", "deepseek-r1:1.5b")
+    )
+
+
+# 애플리케이션 전역에서 사용할 단일 설정 인스턴스
+# 모듈 임포트 시점에 한 번 생성되며, 이후 변경되지 않음
+settings = Settings()
