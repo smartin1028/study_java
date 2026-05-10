@@ -21,6 +21,7 @@ interface NodeConfigPanelProps {
   selectedNode: NodeConfig | null;
   onClose: () => void;
   onSave: (config: NodeConfig) => void;
+  onDelete?: () => void;
   onOpenChat?: () => void;
 }
 
@@ -28,6 +29,7 @@ const NodeConfigPanel = ({
   selectedNode,
   onClose,
   onSave,
+  onDelete,
   onOpenChat,
 }: NodeConfigPanelProps) => {
   const [config, setConfig] = useState<NodeConfig | null>(selectedNode);
@@ -200,6 +202,14 @@ const NodeConfigPanel = ({
         <button onClick={handleSave} style={saveButtonStyle}>저장</button>
         <button onClick={onClose} style={cancelButtonStyle}>취소</button>
       </div>
+
+      {onDelete && (
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
+          <button onClick={onDelete} style={deleteButtonStyle}>
+            🗑️ 노드 삭제
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -368,6 +378,18 @@ const chatButtonStyle: React.CSSProperties = {
   width: '100%',
   padding: '10px 16px',
   backgroundColor: '#10b981',
+  color: 'white',
+  border: 'none',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  fontSize: '14px',
+  fontWeight: '600',
+};
+
+const deleteButtonStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 16px',
+  backgroundColor: '#ef4444',
   color: 'white',
   border: 'none',
   borderRadius: '6px',

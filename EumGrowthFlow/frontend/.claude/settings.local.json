@@ -4,7 +4,10 @@
       "Bash(npm install *)",
       "Read(//Users/daewonlee/dev/git/repos/study_java/EumGrowthFlow/backend/**)",
       "Bash(python -m pytest app/tests/ -v)",
-      "Bash(python -m pytest tests/ -v)"
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(open *)"
     ]
   }
 }

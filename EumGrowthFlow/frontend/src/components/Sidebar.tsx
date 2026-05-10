@@ -52,6 +52,7 @@ const Sidebar = () => {
     event.dataTransfer.setData('label', nodeType.label);
     event.dataTransfer.setData('agentType', nodeType.agentType);
     event.dataTransfer.setData('description', nodeType.description);
+    event.dataTransfer.setData('icon', nodeType.icon);
     event.dataTransfer.effectAllowed = 'move';
   };
 

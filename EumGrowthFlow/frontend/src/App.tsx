@@ -15,6 +15,8 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
   BackgroundVariant,
+  useReactFlow,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -57,6 +59,118 @@ const initialNodes = [
 ];
 
 const initialEdges: any[] = [];
+
+interface FlowCanvasProps {
+  nodes: any[];
+  edges: any[];
+  onNodesChange: any;
+  onEdgesChange: any;
+  onConnect: any;
+  onNodeClick: any;
+  onPaneClick: any;
+  setNodes: any;
+  setEdges: any;
+}
+
+function FlowCanvas({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onConnect,
+  onNodeClick,
+  onPaneClick,
+  setNodes,
+  setEdges,
+}: FlowCanvasProps) {
+  const reactFlowInstance = useReactFlow();
+
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData('application/reactflow');
+      const label = event.dataTransfer.getData('label');
+      const agentType = event.dataTransfer.getData('agentType');
+      const description = event.dataTransfer.getData('description');
+      const icon = event.dataTransfer.getData('icon');
+
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const newNode = {
+        id: `${Date.now()}`,
+        type,
+        position,
+        data: { label, agentType, description, icon },
+      };
+
+      setNodes((nds: any[]) => nds.concat(newNode));
+    },
+    [setNodes, reactFlowInstance],
+  );
+
+  const onKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        const selectedNodeIds = nodes
+          .filter((n: any) => n.selected)
+          .map((n: any) => n.id);
+        const selectedEdgeIds = edges
+          .filter((e: any) => e.selected)
+          .map((e: any) => e.id);
+
+        if (selectedNodeIds.length > 0) {
+          setNodes((nds: any[]) =>
+            nds.filter((n: any) => !n.selected),
+          );
+          setEdges((eds: any[]) =>
+            eds.filter(
+              (e: any) =>
+                !selectedNodeIds.includes(e.source) &&
+                !selectedNodeIds.includes(e.target),
+            ),
+          );
+        }
+        if (selectedEdgeIds.length > 0) {
+          setEdges((eds: any[]) =>
+            eds.filter((e: any) => !e.selected),
+          );
+        }
+      }
+    },
+    [nodes, edges, setNodes, setEdges],
+  );
+
+  return (
+    <div style={{ width: '100%', height: '100%' }} onKeyDown={onKeyDown} tabIndex={0}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onNodeClick={onNodeClick}
+        onPaneClick={onPaneClick}
+        nodeTypes={nodeTypes}
+        fitView
+      >
+        <Controls />
+        <MiniMap />
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+      </ReactFlow>
+    </div>
+  );
+}
 
 function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -103,37 +217,6 @@ function App() {
           return node;
         }),
       );
-    },
-    [setNodes],
-  );
-
-  const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
-
-      const type = event.dataTransfer.getData('application/reactflow');
-      const label = event.dataTransfer.getData('label');
-      const agentType = event.dataTransfer.getData('agentType');
-      const description = event.dataTransfer.getData('description');
-
-      const position = {
-        x: event.clientX - 250,
-        y: event.clientY - 100,
-      };
-
-      const newNode = {
-        id: `${Date.now()}`,
-        type,
-        position,
-        data: { label, agentType, description },
-      };
-
-      setNodes((nds) => nds.concat(newNode));
     },
     [setNodes],
   );
@@ -191,6 +274,17 @@ function App() {
       setSelectedNode(null);
     }
   }, [selectedNode]);
+
+  const handleDeleteNode = useCallback(
+    (nodeId: string) => {
+      setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+      setEdges((eds) =>
+        eds.filter((e) => e.source !== nodeId && e.target !== nodeId),
+      );
+      setSelectedNode(null);
+    },
+    [setNodes, setEdges],
+  );
 
   // 암호화 저장
   const handleEncryptedSave = useCallback(() => {
@@ -280,23 +374,19 @@ function App() {
         </div>
 
         <div style={{ flexGrow: 1, position: 'relative', minHeight: 0 }}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onNodeClick={onNodeClick}
-            onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes}
-            fitView
-          >
-            <Controls />
-            <MiniMap />
-            <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-          </ReactFlow>
+          <ReactFlowProvider>
+            <FlowCanvas
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onNodeClick={onNodeClick}
+              onPaneClick={onPaneClick}
+              setNodes={setNodes}
+              setEdges={setEdges}
+            />
+          </ReactFlowProvider>
         </div>
       </div>
 
@@ -306,6 +396,7 @@ function App() {
           selectedNode={{ id: selectedNode.id, ...selectedNode.data }}
           onClose={() => setSelectedNode(null)}
           onSave={handleSaveNodeConfig}
+          onDelete={() => handleDeleteNode(selectedNode.id)}
           onOpenChat={
             selectedNode.data.agentType === 'llm'
               ? handleOpenChat

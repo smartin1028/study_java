@@ -122,6 +122,39 @@ class Settings:
         default_factory=lambda: int(os.getenv("LOG_ROTATION_INTERVAL", "1"))
     )
 
+    # ---- Oracle Database 설정 ----
+
+    oracle_host: str = field(
+        default_factory=lambda: os.getenv("ORACLE_HOST", "localhost")
+    )
+    oracle_port: int = field(
+        default_factory=lambda: int(os.getenv("ORACLE_PORT", "1521"))
+    )
+    oracle_service_name: str = field(
+        default_factory=lambda: os.getenv("ORACLE_SERVICE_NAME", "XEPDB1")
+    )
+    oracle_user: str = field(
+        default_factory=lambda: os.getenv("ORACLE_USER", "app_user")
+    )
+    oracle_password: str = field(
+        default_factory=lambda: os.getenv("ORACLE_PASSWORD", "")
+    )
+    oracle_ro_user: str = field(
+        default_factory=lambda: os.getenv("ORACLE_RO_USER", "")
+    )
+    oracle_ro_password: str = field(
+        default_factory=lambda: os.getenv("ORACLE_RO_PASSWORD", "")
+    )
+    oracle_pool_min: int = field(
+        default_factory=lambda: int(os.getenv("ORACLE_POOL_MIN", "1"))
+    )
+    oracle_pool_max: int = field(
+        default_factory=lambda: int(os.getenv("ORACLE_POOL_MAX", "5"))
+    )
+    oracle_pool_increment: int = field(
+        default_factory=lambda: int(os.getenv("ORACLE_POOL_INCREMENT", "1"))
+    )
+
 
 # 애플리케이션 전역에서 사용할 단일 설정 인스턴스
 # 모듈 임포트 시점에 한 번 생성되며, 이후 변경되지 않음

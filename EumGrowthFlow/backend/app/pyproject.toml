@@ -6,6 +6,8 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.136.1",
     "httpx>=0.28.0",
+    "oracledb>=4.0",
+    "pandas>=3.0.2",
     "pydantic>=2.13.4",
     "python-dotenv>=1.1.0",
     "uvicorn>=0.46.0",

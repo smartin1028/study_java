@@ -25,3 +25,9 @@ def client(mock_provider):
     app.dependency_overrides[get_provider] = lambda: mock_provider
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def shared_config() -> dict:
+    """예제 테스트용 공유 설정"""
+    return {"app_name": "EumGrowthFlow", "version": "0.1.0"}
