@@ -14,6 +14,7 @@ from providers.base import AbstractLLMProvider
 from providers.ollama import OllamaProvider
 from providers.deepseek import DeepSeekProvider
 from providers.openai import OpenAIProvider
+from providers.custom import CustomProvider
 from config import settings
 
 
@@ -25,6 +26,7 @@ def get_provider() -> AbstractLLMProvider:
       - "ollama": 로컬 Ollama 서버
       - "deepseek": DeepSeek API (OpenAI 호환)
       - "openai": OpenAI API
+      - "custom": OpenAI 호환 임의 엔드포인트 (vLLM, OpenRouter 등)
 
     Returns:
         AbstractLLMProvider: LLM 제공자 구현체 인스턴스
@@ -44,6 +46,8 @@ def get_provider() -> AbstractLLMProvider:
             return DeepSeekProvider()
         case "openai":
             return OpenAIProvider()
+        case "custom":
+            return CustomProvider()
         case _:
             raise ValueError(
                 f"Unknown LLM_PROVIDER: {settings.llm_provider}"

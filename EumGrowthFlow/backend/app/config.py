@@ -77,6 +77,23 @@ class Settings:
         default_factory=lambda: os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
     )
 
+    # ---- Custom OpenAI-compatible API 설정 ----
+
+    # OpenAI 호환 API 의 기본 URL (vLLM, OpenRouter, Groq 등)
+    custom_base_url: str = field(
+        default_factory=lambda: os.getenv("CUSTOM_BASE_URL", "http://localhost:8000")
+    )
+
+    # Custom API 인증 키 (필요한 경우만 설정)
+    custom_api_key: str = field(
+        default_factory=lambda: os.getenv("CUSTOM_API_KEY", "")
+    )
+
+    # Custom 기본 모델명
+    custom_model: str = field(
+        default_factory=lambda: os.getenv("CUSTOM_MODEL", "default")
+    )
+
     # ---- 로그 설정 ----
 
     # 로그 로테이션 방식: "size" (파일 크기 기준) 또는 "time" (시간 기준)
