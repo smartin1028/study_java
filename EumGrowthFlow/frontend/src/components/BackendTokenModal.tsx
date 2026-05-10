@@ -1,9 +1,15 @@
-/**
- * 백엔드 API 토큰 설정 모달
- *
- * 백엔드 POST /llm 호출 시 필요한 Bearer 토큰을 입력/저장/초기화한다.
- * 토큰은 localStorage 에 저장되며 llmClient 모듈을 통해 사용된다.
- */
+//
+// BackendTokenModal — 백엔드 API Bearer 토큰 설정 모달
+//
+// Java 비교: 설정 대화상자 (JDialog + Properties 설정).
+//           SettingsDialog dialog = new SettingsDialog("API 토큰 설정");
+//           dialog.addField("Bearer 토큰", new JPasswordField());
+//           dialog.onSave(token -> Preferences.put("token", token));
+//
+// localStorage: 브라우저의 key-value 저장소 (세션 간 유지)
+// Java 비교: java.util.prefs.Preferences (운영체제별 저장소)
+//           또는 Properties 파일 (.env 파일과 유사)
+//
 
 import { useState } from 'react';
 import { getBearerToken } from '../services/llmClient';
@@ -25,6 +31,11 @@ const BackendTokenModal = ({
 }: BackendTokenModalProps) => {
   const [token, setToken] = useState('');
   const [error, setError] = useState('');
+
+  //
+  // getBearerToken(): localStorage 에서 현재 저장된 토큰을 읽는다.
+  // Java: String existingToken = Preferences.userRoot().get("bearer_token", null);
+  //
   const existingToken = getBearerToken();
 
   if (!isOpen) return null;
@@ -57,6 +68,7 @@ const BackendTokenModal = ({
 
   return (
     <div style={overlayStyle} onClick={handleCancel}>
+      {/* e.stopPropagation() → 내부 클릭 시 모달이 닫히지 않도록 */}
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
         <div style={headerStyle}>
           <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>
@@ -75,6 +87,7 @@ const BackendTokenModal = ({
             </div>
           </div>
 
+          {/* 기존 토큰이 있으면 미리보기 표시 */}
           {hasExistingToken && (
             <div style={existingTokenBoxStyle}>
               <div style={{ fontSize: '13px', fontWeight: '600', color: '#059669', marginBottom: '4px' }}>
@@ -89,7 +102,7 @@ const BackendTokenModal = ({
           <div style={fieldStyle}>
             <label style={labelStyle}>Bearer 토큰</label>
             <input
-              type="password"
+              type="password"       // 입력 내용 마스킹 (Java: JPasswordField)
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="백엔드 LLM_BEARER_TOKEN 값을 입력하세요"
@@ -105,6 +118,7 @@ const BackendTokenModal = ({
           )}
 
           <div style={buttonGroupStyle}>
+            {/* 초기화 버튼: 기존 토큰이 있을 때만 표시 */}
             {hasExistingToken && (
               <button type="button" onClick={handleClear} style={clearButtonStyle}>
                 🗑️ 초기화

@@ -1,5 +1,17 @@
+//
+// Sidebar — 드래그 앤 드롭 노드 팔레트
+//
+// Java 비교: JToolBar / JPanel 기반의 도구 팔레트.
+//           ToolPalette palette = new ToolPalette();
+//           palette.addTool(new ToolIcon("LLM Agent", () -> createLLMNode()));
+//
+
 import type { DragEvent } from 'react';
 
+//
+// NodeType 인터페이스
+// Java: record NodeType(String type, String label, String agentType, ...) { }
+//
 interface NodeType {
   type: string;
   label: string;
@@ -8,6 +20,13 @@ interface NodeType {
   icon: string;
 }
 
+//
+// 팔레트에 표시할 노드 타입 목록 (정적 상수)
+// Java: private static final List<NodeType> NODE_TYPES = List.of(
+//           new NodeType("aiAgent", "LLM Agent", "llm", "AI 언어 모델 노드", "🤖"),
+//           ...
+//       );
+//
 const nodeTypes: NodeType[] = [
   {
     type: 'aiAgent',
@@ -46,8 +65,24 @@ const nodeTypes: NodeType[] = [
   },
 ];
 
+//
+// Sidebar 컴포넌트
+// Java: public class Sidebar extends JPanel { ... }
+//
 const Sidebar = () => {
+  //
+  // onDragStart: HTML5 Drag and Drop API 를 통해 데이터를 설정한다.
+  // Java 비교:
+  //   TransferHandler handler = new TransferHandler() {
+  //       protected Transferable createTransferable(JComponent c) {
+  //           return new StringSelection(nodeType.type);
+  //       }
+  //   };
+  //   component.setTransferHandler(handler);
+  //
   const onDragStart = (event: DragEvent, nodeType: NodeType) => {
+    // dataTransfer: 드래그 중인 데이터를 담는 컨테이너
+    // Java: Clipboard / Transferable 에 해당
     event.dataTransfer.setData('application/reactflow', nodeType.type);
     event.dataTransfer.setData('label', nodeType.label);
     event.dataTransfer.setData('agentType', nodeType.agentType);
@@ -70,10 +105,18 @@ const Sidebar = () => {
         노드 팔레트
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/*
+          nodeTypes.map(node => <div key={...}>...</div>)
+          Java: nodeTypes.stream().map(node -> renderNodeItem(node)).toList();
+
+          key prop: React 가 리스트 렌더링 시 각 항목을 식별하는 고유값.
+          Java: HashMap 의 키 개념. key 가 없으면 React 가 어떤 항목이
+                변경되었는지 알 수 없어 비효율적으로 전체를 다시 그린다.
+        */}
         {nodeTypes.map((node) => (
           <div
             key={`${node.agentType}-${node.label}`}
-            draggable
+            draggable                          // HTML5 draggable 속성
             onDragStart={(e) => onDragStart(e, node)}
             style={{
               padding: '12px',
@@ -83,6 +126,11 @@ const Sidebar = () => {
               cursor: 'grab',
               transition: 'all 0.2s',
             }}
+            // onMouseEnter/Leave: 인라인 이벤트로 hover 효과 구현
+            // Java: component.addMouseListener(new MouseAdapter() {
+            //           public void mouseEntered(MouseEvent e) { ... }
+            //           public void mouseExited(MouseEvent e) { ... }
+            //       });
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
               e.currentTarget.style.transform = 'translateY(-2px)';

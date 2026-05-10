@@ -1,9 +1,17 @@
-/**
- * LLM 채팅 인터페이스
- *
- * 선택된 LLM 노드와 대화할 수 있는 우측 채팅 패널.
- * 백엔드 /llm API 를 통해 대화를 처리하며, 이전 대화 이력을 프롬프트에 포함한다.
- */
+//
+// ChatInterface — LLM 과 대화하는 채팅 패널
+//
+// Java 비교: JPanel 기반의 채팅 클라이언트 UI.
+//           ChatClient chatClient = new ChatClient(model);
+//           chatClient.onMessageReceived(msg -> appendMessage(msg));
+//
+// React 특유 개념:
+//   - useRef: 렌더링 간에 유지되는 가변 참조 (DOM 접근용)
+//     Java: private JScrollPane scrollPane; (인스턴스 필드, 리렌더링 무관)
+//   - useEffect + scrollToBottom: 새 메시지 도착 시 자동 스크롤
+//     Java: scrollPane.getVerticalScrollBar().setValue(max);
+//   - ReactMarkdown: 외부 라이브러리 (CommonMark → HTML 변환)
+//
 
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -11,6 +19,10 @@ import { callLLM, hasBearerToken } from '../services/llmClient';
 import type { ChatMessage } from '../services/llmClient';
 import './ChatInterface.css';
 
+//
+// 메시지 데이터 구조체
+// Java: record Message(String role, String content, Instant timestamp) { }
+//
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -30,16 +42,36 @@ const ChatInterface = ({
   maxHistory = 5,
   onClose,
 }: ChatInterfaceProps) => {
+  //
+  // 지역 상태들
+  // Java: private List<Message> messages = new ArrayList<>();
+  //       private String input = "";
+  //       private boolean isLoading = false;
+  //
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [historyLimit, setHistoryLimit] = useState(maxHistory);
+
+  //
+  // useRef: DOM 요소에 대한 참조를 저장한다.
+  // Java: private JTextArea chatArea;  — 필드에 컴포넌트 참조 보관.
+  //
+  // ref.current 는 렌더링 결과물이 실제 DOM 에 마운트된 후 설정된다.
+  // useState 와 달리 ref 값 변경은 리렌더링을 유발하지 않는다.
+  //
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  //
+  // useEffect: messages 가 변경될 때마다 스크롤을 맨 아래로
+  // Java: messages.addPropertyChangeListener(evt -> scrollToBottom());
+  //
+  // deps 가 [messages] → messages 배열이 바뀔 때만 실행
+  //
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -53,11 +85,20 @@ const ChatInterface = ({
       timestamp: new Date(),
     };
 
+    //
+    // setMessages(prev => [...prev, newMsg])
+    // "함수형 업데이트": 이전 상태를 인자로 받아 새 상태를 반환한다.
+    // Java: List<Message> updated = new ArrayList<>(messages);
+    //       updated.add(userMessage); setMessages(updated);
+    //
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
+      // 최근 메시지만 잘라서 컨텍스트로 전송 (토큰 절약)
+      // Java: List<Message> recent = messages.subList(
+      //           Math.max(0, messages.size() - historyLimit), messages.size());
       const recentMessages = messages.slice(-historyLimit);
       const chatMessages: ChatMessage[] = [
         ...recentMessages.map((msg) => ({
@@ -88,9 +129,19 @@ const ChatInterface = ({
     }
   };
 
+  //
+  // 키보드 이벤트: Enter → 전송 (Shift+Enter 는 줄바꿈)
+  // Java: textArea.addKeyListener(new KeyAdapter() {
+  //           public void keyPressed(KeyEvent e) {
+  //               if (e.getKeyCode() == KeyEvent.VK_ENTER && !e.isShiftDown()) {
+  //                   sendMessage();
+  //               }
+  //           }
+  //       });
+  //
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
+      e.preventDefault();   // 기본 Enter 동작(줄바꿈) 방지
       sendMessage();
     }
   };
@@ -99,6 +150,10 @@ const ChatInterface = ({
     setMessages([]);
   };
 
+  //
+  // 동적 버튼 활성화 여부 계산 (렌더링마다 다시 계산됨)
+  // Java: boolean canSend = !isLoading && !input.trim().isEmpty() && hasBearerToken();
+  //
   const canSend = !isLoading && input.trim().length > 0 && hasBearerToken();
 
   return (
@@ -123,7 +178,7 @@ const ChatInterface = ({
         </div>
       </div>
 
-      {/* 히스토리 설정 */}
+      {/* 히스토리 제한 설정 */}
       <div style={historyControlStyle}>
         <label style={{ fontSize: '12px', color: '#6b7280' }}>
           대화 히스토리 개수:
@@ -138,7 +193,7 @@ const ChatInterface = ({
         />
       </div>
 
-      {/* 메시지 영역 */}
+      {/* 메시지 목록 — 스크롤 가능 영역 */}
       <div style={messagesContainerStyle}>
         {messages.length === 0 ? (
           <div style={emptyStateStyle}>
@@ -156,6 +211,7 @@ const ChatInterface = ({
               className={msg.role === 'user' ? 'user-message' : ''}
               style={{
                 ...messageStyle,
+                // 메시지 역할에 따라 좌/우 정렬
                 alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
                 backgroundColor: msg.role === 'user' ? '#3b82f6' : '#fff',
                 color: msg.role === 'user' ? '#fff' : '#1f2937',
@@ -169,6 +225,14 @@ const ChatInterface = ({
                 {msg.role === 'user' ? '👤 You' : '🤖 AI'}
               </div>
               <div className="markdown-content" style={{ wordWrap: 'break-word' }}>
+                {/*
+                  AI 응답은 Markdown 으로 렌더링, 사용자 입력은 일반 텍스트
+                  Java: if (msg.role == "assistant") {
+                            markdownRenderer.render(msg.content);
+                        } else {
+                            new JLabel(msg.content);
+                        }
+                */}
                 {msg.role === 'assistant' ? (
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                 ) : (
@@ -183,6 +247,10 @@ const ChatInterface = ({
             </div>
           ))
         )}
+        {/*
+          스크롤 앵커: 이 div 로 자동 스크롤된다.
+          Java: scrollPane.scrollRectToVisible(anchor.getBounds());
+        */}
         <div ref={messagesEndRef} />
       </div>
 

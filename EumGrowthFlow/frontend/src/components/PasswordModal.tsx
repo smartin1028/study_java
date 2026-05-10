@@ -1,5 +1,19 @@
+//
+// PasswordModal — 암호화 저장/불러오기용 비밀번호 입력 모달
+//
+// Java 비교: JDialog / JOptionPane.showInputDialog() 로 구현하는 모달 대화상자.
+//           ModalDialog dialog = new ModalDialog(parent, "암호화 저장");
+//           dialog.addField("비밀번호", new JPasswordField());
+//           dialog.addButton("확인", () -> onConfirm(dialog.getPassword()));
+//
+
 import { useState } from 'react';
 
+//
+// Props: 모달을 제어하는 데이터와 콜백
+// Java: public PasswordModal(Frame owner, boolean isOpen, String mode,
+//                            Consumer<String> onConfirm, Runnable onCancel) { ... }
+//
 interface PasswordModalProps {
   isOpen: boolean;
   mode: 'save' | 'load';
@@ -8,14 +22,19 @@ interface PasswordModalProps {
 }
 
 const PasswordModal = ({ isOpen, mode, onConfirm, onCancel }: PasswordModalProps) => {
+  // 로컬 상태: 폼 필드와 에러 메시지
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
+  //
+  // 모달이 닫혀있으면 아무것도 렌더링하지 않는다.
+  // Java: if (!isOpen) { dialog.setVisible(false); return; }
+  //
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault();   // 폼 기본 제출 동작(페이지 새로고침) 방지
     setError('');
 
     if (!password) {
@@ -34,6 +53,7 @@ const PasswordModal = ({ isOpen, mode, onConfirm, onCancel }: PasswordModalProps
     }
 
     onConfirm(password);
+    // 확인 후 폼 초기화
     setPassword('');
     setConfirmPassword('');
     setError('');
@@ -47,7 +67,13 @@ const PasswordModal = ({ isOpen, mode, onConfirm, onCancel }: PasswordModalProps
   };
 
   return (
+    // overlayStyle: 반투명 배경 → 클릭 시 취소 (모달 바깥 클릭 = 취소)
+    // Java: JDialog.setModal(true); dialog.setBackground(new Color(0,0,0,128));
     <div style={overlayStyle} onClick={handleCancel}>
+      {/*
+        e.stopPropagation(): 모달 내부 클릭이 오버레이까지 전파되지 않도록 방지
+        Java: MouseEvent.consume() — 이벤트 소비
+      */}
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
         <div style={headerStyle}>
           <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>
@@ -76,10 +102,11 @@ const PasswordModal = ({ isOpen, mode, onConfirm, onCancel }: PasswordModalProps
               onChange={(e) => setPassword(e.target.value)}
               placeholder="최소 4자 이상"
               style={inputStyle}
-              autoFocus
+              autoFocus   // 모달 열릴 때 자동 포커스
             />
           </div>
 
+          {/* 저장 모드일 때만 비밀번호 확인 필드 표시 */}
           {mode === 'save' && (
             <div style={fieldStyle}>
               <label style={labelStyle}>비밀번호 확인</label>
@@ -93,6 +120,7 @@ const PasswordModal = ({ isOpen, mode, onConfirm, onCancel }: PasswordModalProps
             </div>
           )}
 
+          {/* 조건부 렌더링: 에러가 있을 때만 에러 박스 표시 */}
           {error && (
             <div style={errorStyle}>
               ⚠️ {error}

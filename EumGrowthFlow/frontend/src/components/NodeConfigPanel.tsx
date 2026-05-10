@@ -1,14 +1,25 @@
-/**
- * 노드 설정 패널
- *
- * 선택된 워크플로우 노드의 설정을 편집하는 우측 슬라이드 패널.
- * LLM 노드의 경우 프롬프트, 모델명을 설정하고 백엔드 API 테스트를 수행할 수 있다.
- * API URL, API Key 등은 백엔드에서 관리하므로 더 이상 노드별로 설정하지 않는다.
- */
+//
+// NodeConfigPanel — 노드 설정 편집 슬라이드 패널
+//
+// Java 비교: JDialog / JOptionPane 기반의 설정 대화상자 (Modal Dialog).
+//           또는 Eclipse/IntelliJ 의 Properties View (Dockable Panel).
+//
+// React 패턴:
+//   - "제어 컴포넌트(Controlled Component)": input 의 value 를 React state 로 제어
+//     Java: DocumentListener 로 JTextField 변경 감지 → Model 업데이트
+//   - 콜백 Props (onSave, onDelete): 부모(App)에게 액션 위임
+//     Java: ActionListener 콜백 / Observer 패턴
+//   - 조건부 렌더링은 부모에서 처리 ({selectedNode && <NodeConfigPanel/>})
+//     → Panel 자체는 항상 전체 DOM 을 그리고, 부모가 표시 여부를 결정
+//
 
 import { useState, useEffect } from 'react';
 import { callLLM } from '../services/llmClient';
 
+//
+// 노드 설정 데이터 구조체
+// Java: record NodeConfig(String id, String label, String agentType, ...) { }
+//
 interface NodeConfig {
   id: string;
   label: string;
@@ -17,6 +28,13 @@ interface NodeConfig {
   model?: string;
 }
 
+//
+// Props 인터페이스 — 콜백 기반 이벤트 처리
+// Java: ActionListener / Consumer<T> 콜백 인터페이스
+//   onClose: () => void        = Runnable
+//   onSave:  (config) => void  = Consumer<NodeConfig>
+//   onDelete: () => void       = Runnable (optional)
+//
 interface NodeConfigPanelProps {
   selectedNode: NodeConfig | null;
   onClose: () => void;
@@ -32,15 +50,40 @@ const NodeConfigPanel = ({
   onDelete,
   onOpenChat,
 }: NodeConfigPanelProps) => {
+  //
+  // useState: React 의 지역 상태 관리
+  // Java: private NodeConfig config;
+  //       private TestResult testResult;
+  //       private boolean isTesting;
+  //
+  // setConfig → config 상태 업데이트 + 리렌더링 예약
+  // setConfig({ ...config, label: "새 이름" }) → "불변 업데이트" (스프레드로 복사)
+  //
   const [config, setConfig] = useState<NodeConfig | null>(selectedNode);
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
 
+  //
+  // useEffect: 부모가 선택한 노드가 바뀌면 config 를 새로 설정한다.
+  // Java 비교: @PostConstruct + PropertyChangeListener 를 합친 개념.
+  //
+  // useEffect(() => { ... }, [selectedNode]);
+  //   → selectedNode 가 변경될 때만 이펙트 실행 (의존성 배열)
+  //   → 의존성 배열이 [] 이면 "마운트 시 1회만 실행" (Java: @PostConstruct)
+  //   → 의존성 배열 생략 시 "매 렌더링마다 실행" (비추천)
+  //
+  // 클린업 함수(return)는 여기서 필요 없지만, 보통 이벤트 리스너 해제에 사용.
+  // Java: @PreDestroy / removePropertyChangeListener()
+  //
   useEffect(() => {
     setConfig(selectedNode);
     setTestResult(null);
   }, [selectedNode]);
 
+  //
+  // config 가 null 이면 아무것도 렌더링하지 않는다 (부모에서 조건부로 보여주지만 방어적 처리)
+  // Java: if (config == null) return; (early return)
+  //
   if (!config) return null;
 
   const handleSave = () => {
@@ -48,6 +91,12 @@ const NodeConfigPanel = ({
     onClose();
   };
 
+  //
+  // LLM API 테스트 (비동기)
+  // Java: CompletableFuture.supplyAsync(() -> llmClient.call(messages, model))
+  //          .thenAccept(data -> updateUI(data))
+  //          .exceptionally(e -> showError(e));
+  //
   const handleTest = async () => {
     if (!config.prompt) {
       setTestResult({
@@ -81,6 +130,17 @@ const NodeConfigPanel = ({
         <button onClick={onClose} style={closeButtonStyle}>✕</button>
       </div>
 
+      {/*
+        input 의 value={config.label} + onChange={...setConfig(...)}
+        → "제어 컴포넌트(Controlled Component)" 패턴
+        Java: JTextField tf = new JTextField(config.getLabel());
+              tf.getDocument().addDocumentListener(doc -> {
+                  config.setLabel(tf.getText());
+              });
+
+        React 의 제어 컴포넌트는 단방향 데이터 흐름을 강제한다:
+          state → value={state} → 사용자 입력 → onChange → setState → 리렌더링
+      */}
       <div style={{ marginBottom: '16px' }}>
         <label style={labelStyle}>노드 이름</label>
         <input
@@ -105,6 +165,7 @@ const NodeConfigPanel = ({
         />
       </div>
 
+      {/* LLM 노드일 때만 추가 설정 필드 표시 */}
       {isLLMNode && (
         <>
           <div style={backendInfoBoxStyle}>
@@ -142,7 +203,6 @@ const NodeConfigPanel = ({
             </p>
           </div>
 
-          {/* 테스트 및 채팅 버튼 */}
           <div style={buttonRowStyle}>
             <button
               onClick={handleTest}
@@ -161,7 +221,7 @@ const NodeConfigPanel = ({
             )}
           </div>
 
-          {/* 테스트 결과 */}
+          {/* 테스트 결과 조건부 렌더링 */}
           {testResult && (
             <div style={testResultContainerStyle(testResult.success)}>
               <div style={testResultHeaderStyle(testResult.success)}>
@@ -203,6 +263,10 @@ const NodeConfigPanel = ({
         <button onClick={onClose} style={cancelButtonStyle}>취소</button>
       </div>
 
+      {/*
+        onDelete 콜백이 있을 때만 삭제 버튼 영역 표시
+        Java: if (onDelete != null) { add(deleteButton); }
+      */}
       {onDelete && (
         <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
           <button onClick={onDelete} style={deleteButtonStyle}>
@@ -213,6 +277,12 @@ const NodeConfigPanel = ({
     </div>
   );
 };
+
+//
+// ── 스타일 ──
+// React.CSSProperties: CSS 속성을 TypeScript 타입으로 정의한 것.
+// Java: StyleConstants 클래스에 상수로 정의하는 것과 유사.
+//
 
 const panelStyle: React.CSSProperties = {
   position: 'fixed',
@@ -272,6 +342,12 @@ const buttonRowStyle: React.CSSProperties = {
   gap: '8px',
 };
 
+//
+// 동적 스타일 함수 — 파라미터에 따라 다른 스타일 객체를 반환
+// Java: Color getResultColor(boolean success) {
+//           return success ? new Color(0xf0, 0xfd, 0xf4) : new Color(0xfe, 0xf2, 0xf2);
+//       }
+//
 const testResultContainerStyle = (success: boolean): React.CSSProperties => ({
   marginTop: '16px',
   padding: '12px',

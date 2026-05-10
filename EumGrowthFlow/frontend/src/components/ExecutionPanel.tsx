@@ -1,3 +1,10 @@
+//
+// ExecutionPanel — 워크플로우 실행 결과를 표시하는 하단 패널
+//
+// Java 비교: JPanel 기반의 Log Viewer / Console Output 패널.
+//           SwingWorker 로 백그라운드 작업 실행 후 결과를 JTable / JTextArea 에 표시.
+//
+
 interface ExecutionResult {
   nodeId: string;
   success: boolean;
@@ -5,6 +12,10 @@ interface ExecutionResult {
   error?: string;
 }
 
+//
+// Props: 부모가 전달하는 "읽기 전용 데이터" + 콜백
+// Java: public ExecutionPanel(List<ExecutionResult> results, boolean isRunning, Runnable onClose) { ... }
+//
 interface ExecutionPanelProps {
   results: ExecutionResult[];
   isRunning: boolean;
@@ -36,6 +47,14 @@ const ExecutionPanel = ({ results, isRunning, onClose }: ExecutionPanelProps) =>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/*
+          results.map(result => <div key={index}>...</div>)
+          Java: for (int i = 0; i < results.size(); i++) {
+                    ExecutionResult result = results.get(i);
+                    add(renderResultRow(result, i));
+                }
+          key={index} → index 를 key 로 사용 (순서가 바뀌지 않는 리스트에서는 허용)
+        */}
         {results.map((result, index) => (
           <div
             key={index}
@@ -84,7 +103,7 @@ const ExecutionPanel = ({ results, isRunning, onClose }: ExecutionPanelProps) =>
                   </div>
                 )}
 
-                {/* 전체 응답 (접을 수 있게) */}
+                {/* <details>: HTML5 접기/펼치기 요소 — JS 없이 토글 가능 */}
                 <details style={{ marginTop: '8px' }}>
                   <summary style={{
                     fontSize: '12px',
@@ -122,6 +141,7 @@ const ExecutionPanel = ({ results, isRunning, onClose }: ExecutionPanelProps) =>
           </div>
         ))}
 
+        {/* 조건부 렌더링: 결과가 없고 실행 중도 아닐 때 빈 상태 표시 */}
         {results.length === 0 && !isRunning && (
           <div style={{ textAlign: 'center', color: '#9ca3af', padding: '40px' }}>
             실행 결과가 없습니다.
